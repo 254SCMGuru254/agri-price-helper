@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, UserPlus, LogIn } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -23,6 +25,11 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: fullName,
+            },
+          },
         });
         if (error) throw error;
         toast({
@@ -49,80 +56,104 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold">{isSignUp ? "Create Account" : "Welcome Back"}</h2>
-          <p className="mt-2 text-muted-foreground">
-            {isSignUp ? "Sign up to get started" : "Sign in to your account"}
-          </p>
-        </div>
-
-        <form onSubmit={handleAuth} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              "Loading..."
-            ) : isSignUp ? (
-              <>
-                <UserPlus className="mr-2 h-4 w-4" /> Sign Up
-              </>
-            ) : (
-              <>
-                <LogIn className="mr-2 h-4 w-4" /> Sign In
-              </>
-            )}
-          </Button>
-
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="container flex items-center justify-center px-4 py-24">
+        <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-lg rounded-lg animate-fade-up">
           <div className="text-center">
-            <Button
-              type="button"
-              variant="link"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm"
-            >
-              {isSignUp
-                ? "Already have an account? Sign in"
-                : "Don't have an account? Sign up"}
-            </Button>
+            <h2 className="text-3xl font-bold text-foreground">
+              {isSignUp ? "Create Account" : "Welcome Back"}
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              {isSignUp ? "Sign up to get started" : "Sign in to your account"}
+            </p>
           </div>
-        </form>
+
+          <form onSubmit={handleAuth} className="mt-8 space-y-6">
+            <div className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <label htmlFor="fullName" className="sr-only">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <UserPlus className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Full Name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="pl-10"
+                      required={isSignUp}
+                    />
+                  </div>
+                </div>
+              )}
+              <div>
+                <label htmlFor="email" className="sr-only">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                "Loading..."
+              ) : isSignUp ? (
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" /> Sign Up
+                </>
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" /> Sign In
+                </>
+              )}
+            </Button>
+
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-sm"
+              >
+                {isSignUp
+                  ? "Already have an account? Sign in"
+                  : "Don't have an account? Sign up"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
