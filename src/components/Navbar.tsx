@@ -1,7 +1,29 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./AuthProvider";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/auth");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md z-50 border-b">
       <div className="max-w-7xl mx-auto px-4">
@@ -19,10 +41,19 @@ export const Navbar = () => {
             <a href="#how-it-works" className="text-foreground/80 hover:text-primary transition-colors">
               How it Works
             </a>
-            <Button variant="outline" className="mr-2">
-              Sign In
-            </Button>
-            <Button>Get Started</Button>
+            {user ? (
+              <Button variant="outline" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => navigate("/auth")}>
+                  Sign In
+                </Button>
+                <Button onClick={() => navigate("/auth")}>Get Started</Button>
+              </>
+            )}
           </div>
           
           <button className="md:hidden p-2">

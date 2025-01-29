@@ -9,7 +9,160 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      agricultural_advice: {
+        Row: {
+          author_id: string
+          category: string
+          content: string
+          created_at: string
+          id: string
+          location: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agricultural_advice_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_prices: {
+        Row: {
+          commodity: string
+          created_at: string
+          id: string
+          location: string
+          price: number
+          status: Database["public"]["Enums"]["price_status"] | null
+          submitted_by: string
+          unit: string
+          updated_at: string
+          votes_count: number | null
+        }
+        Insert: {
+          commodity: string
+          created_at?: string
+          id?: string
+          location: string
+          price: number
+          status?: Database["public"]["Enums"]["price_status"] | null
+          submitted_by: string
+          unit: string
+          updated_at?: string
+          votes_count?: number | null
+        }
+        Update: {
+          commodity?: string
+          created_at?: string
+          id?: string
+          location?: string
+          price?: number
+          status?: Database["public"]["Enums"]["price_status"] | null
+          submitted_by?: string
+          unit?: string
+          updated_at?: string
+          votes_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_prices_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_votes: {
+        Row: {
+          created_at: string
+          id: string
+          is_valid: boolean
+          price_id: string
+          voter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_valid: boolean
+          price_id: string
+          voter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          price_id?: string
+          voter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_votes_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "market_prices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_votes_voter_id_fkey"
+            columns: ["voter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          location: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          location?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          location?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +171,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      price_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
