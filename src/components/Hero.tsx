@@ -1,28 +1,41 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+
   return (
-    <section className="min-h-[80vh] flex flex-col items-center justify-center px-4 animate-fade-in">
-      <div className="max-w-3xl text-center space-y-6">
-        <span className="px-3 py-1 text-sm font-medium bg-primary/10 text-primary rounded-full">
-          Community-Driven Agricultural Insights
-        </span>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Empowering Farmers with Real-Time Market Intelligence
+    <section className="relative py-20 px-4">
+      <div className="max-w-6xl mx-auto text-center">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          Empowering Farmers with Real-Time Market Insights
         </h1>
-        <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-          Access community-verified market prices and expert agricultural advice - all in one place, completely free.
+        <p className="text-xl text-foreground/80 mb-8 max-w-3xl mx-auto">
+          Join our community to share and access up-to-date agricultural market prices and expert farming advice
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
-            Get Started <ArrowRight className="ml-2 h-4 w-4" />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            size="lg" 
+            onClick={() => navigate('/auth')}
+            className="bg-accent hover:bg-accent/90"
+          >
+            Get Started
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <Button size="lg" variant="outline">
+          <Button 
+            size="lg" 
+            variant="outline"
+            onClick={() => {
+              document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
             Learn More
+            <BookOpen className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
     </section>
   );
 };
