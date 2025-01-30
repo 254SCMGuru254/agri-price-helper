@@ -142,6 +142,7 @@ export type Database = {
           full_name: string | null
           id: string
           location: string | null
+          points: number | null
           updated_at: string
           username: string | null
         }
@@ -150,6 +151,7 @@ export type Database = {
           full_name?: string | null
           id: string
           location?: string | null
+          points?: number | null
           updated_at?: string
           username?: string | null
         }
@@ -158,10 +160,46 @@ export type Database = {
           full_name?: string | null
           id?: string
           location?: string | null
+          points?: number | null
           updated_at?: string
           username?: string | null
         }
         Relationships: []
+      }
+      user_rewards: {
+        Row: {
+          created_at: string
+          id: string
+          points: number
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points?: number
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -172,6 +210,7 @@ export type Database = {
     }
     Enums: {
       price_status: "pending" | "approved" | "rejected"
+      reward_type: "ad_watch" | "price_submission" | "advice_submission"
     }
     CompositeTypes: {
       [_ in never]: never
