@@ -7,12 +7,6 @@ interface PriceMapProps {
   prices: MarketPrice[];
 }
 
-declare global {
-  interface Window {
-    initMap: () => void;
-  }
-}
-
 const PriceMap = ({ prices }: PriceMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
@@ -20,7 +14,7 @@ const PriceMap = ({ prices }: PriceMapProps) => {
 
   useEffect(() => {
     const loadGoogleMaps = () => {
-      if (typeof google !== 'undefined') {
+      if (typeof window.google !== 'undefined') {
         initializeMap();
         return;
       }
