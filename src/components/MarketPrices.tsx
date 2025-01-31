@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import PriceMap from "./PriceMap";
+import { PriceCarousel } from "./PriceCarousel";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 type ExchangeRates = {
@@ -98,14 +99,37 @@ export const MarketPrices = () => {
 
   const organicPrices = prices.filter(price => price.is_organic);
   const nonOrganicPrices = prices.filter(price => !price.is_organic);
+  const pricesByLocation = prices.reduce((acc, price) => {
+    if (!acc[price.location]) {
+      acc[price.location] = [];
+    }
+    acc[price.location].push(price);
+    return acc;
+  }, {} as Record<string, MarketPrice[]>);
 
   return (
-    <Tabs defaultValue="list" className="space-y-4">
+    <Tabs defaultValue="carousel" className="space-y-4">
       <TabsList>
+        <TabsTrigger value="carousel">Carousel View</TabsTrigger>
         <TabsTrigger value="list">List View</TabsTrigger>
         <TabsTrigger value="map">Map View</TabsTrigger>
         <TabsTrigger value="forex">Exchange Rates</TabsTrigger>
       </TabsList>
+
+      <TabsContent value="carousel" className="space-y-8">
+        <PriceCarousel prices={organicPrices} title="Organic Products" />
+        <PriceCarousel prices={nonOrganicPrices} title="Non-Organic Products" />
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Prices by Location</h2>
+          {Object.entries(pricesByLocation).map(([location, locationPrices]) => (
+            <PriceCarousel
+              key={location}
+              prices={locationPrices}
+              title={`Market Prices in ${location}`}
+            />
+          ))}
+        </div>
+      </TabsContent>
       
       <TabsContent value="list">
         <div className="space-y-8">
