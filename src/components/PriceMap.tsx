@@ -1,6 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Database } from "@/integrations/supabase/types";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
@@ -10,44 +8,80 @@ interface PriceMapProps {
 }
 
 const PriceMap = ({ prices }: PriceMapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const googleMapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    const loadGoogleMaps = () => {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.addEventListener('load', initializeMap);
+      document.head.appendChild(script);
+    };
 
-    // Initialize map with a temporary token - user will need to input their own
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [0, 0],
-      zoom: 1
-    });
+    const initializeMap = () => {
+      if (!mapRef.current) return;
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 0, lng: 0 },
+        zoom: 2,
+      });
+      googleMapRef.current = map;
 
-    // Add markers for each price location
-    prices.forEach(price => {
-      // Here we would normally geocode the location string to get coordinates
-      // For now, we'll just show a message that geocoding is needed
-      console.log(`Would place marker for ${price.commodity} in ${price.location}`);
-    });
+      // Create a geocoder instance
+      const geocoder = new google.maps.Geocoder();
+
+      // Clear existing markers
+      markersRef.current.forEach(marker => marker.setMap(null));
+      markersRef.current = [];
+
+      // Add markers for each price location
+      prices.forEach(price => {
+        geocoder.geocode({ address: price.location }, (results, status) => {
+          if (status === 'OK' && results && results[0]) {
+            const marker = new google.maps.Marker({
+              map,
+              position: results[0].geometry.location,
+              title: `${price.commodity} - $${price.price}/${price.unit} (${price.is_organic ? 'Organic' : 'Non-organic'})`
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <div>
+                  <h3>${price.commodity}</h3>
+                  <p>Price: $${price.price}/${price.unit}</p>
+                  <p>${price.is_organic ? 'Organic' : 'Non-organic'}</p>
+                  <p>Location: ${price.location}</p>
+                </div>
+              `
+            });
+
+            marker.addListener('click', () => {
+              infoWindow.open(map, marker);
+            });
+
+            markersRef.current.push(marker);
+          }
+        });
+      });
+    };
+
+    loadGoogleMaps();
 
     return () => {
-      map.current?.remove();
+      markersRef.current.forEach(marker => marker.setMap(null));
     };
   }, [prices]);
 
   return (
     <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <div ref={mapRef} className="absolute inset-0" />
       <div className="absolute top-0 left-0 bg-background/80 p-4 m-4 rounded-lg">
         <p className="text-sm">
-          To use the map feature, you'll need a free Mapbox token.
-          Get one at <a href="https://www.mapbox.com/signup/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Mapbox.com</a>
+          Note: To use Google Maps, you'll need to add your API key.
         </p>
       </div>
     </div>

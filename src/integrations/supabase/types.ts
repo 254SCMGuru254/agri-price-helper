@@ -55,6 +55,7 @@ export type Database = {
           commodity: string
           created_at: string
           id: string
+          is_organic: boolean
           location: string
           price: number
           status: Database["public"]["Enums"]["price_status"] | null
@@ -67,6 +68,7 @@ export type Database = {
           commodity: string
           created_at?: string
           id?: string
+          is_organic?: boolean
           location: string
           price: number
           status?: Database["public"]["Enums"]["price_status"] | null
@@ -79,6 +81,7 @@ export type Database = {
           commodity?: string
           created_at?: string
           id?: string
+          is_organic?: boolean
           location?: string
           price?: number
           status?: Database["public"]["Enums"]["price_status"] | null

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
 
 export const MarketPriceSubmission = () => {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export const MarketPriceSubmission = () => {
     price: "",
     unit: "kg",
     location: "",
+    is_organic: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,6 +38,7 @@ export const MarketPriceSubmission = () => {
         price: parseFloat(formData.price),
         unit: formData.unit,
         location: formData.location,
+        is_organic: formData.is_organic,
         submitted_by: user.id,
       });
 
@@ -51,6 +54,7 @@ export const MarketPriceSubmission = () => {
         price: "",
         unit: "kg",
         location: "",
+        is_organic: false,
       });
     } catch (error) {
       console.error("Error submitting market price:", error);
@@ -126,6 +130,17 @@ export const MarketPriceSubmission = () => {
           }
           placeholder="e.g., Nairobi"
         />
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="organic"
+          checked={formData.is_organic}
+          onCheckedChange={(checked) =>
+            setFormData((prev) => ({ ...prev, is_organic: checked }))
+          }
+        />
+        <Label htmlFor="organic">Organic Product</Label>
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
