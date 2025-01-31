@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import type { Database } from "@/integrations/supabase/types";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
@@ -9,86 +11,57 @@ interface PriceMapProps {
 
 const PriceMap = ({ prices }: PriceMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const googleMapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
+  const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
 
-  const initializeMap = () => {
-    if (!mapRef.current) return;
+  useEffect(() => {
+    if (!mapRef.current || mapInstance.current) return;
 
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: { lat: 0, lng: 0 },
-      zoom: 2,
-    });
-    googleMapRef.current = map;
+    // Initialize map
+    mapInstance.current = L.map(mapRef.current).setView([0, 0], 2);
 
-    // Create a geocoder instance
-    const geocoder = new window.google.maps.Geocoder();
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(mapInstance.current);
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
-    markersRef.current = [];
-
-    // Add markers for each price location
+    // Create markers for each price location
     prices.forEach(price => {
-      geocoder.geocode({ address: price.location }, (results, status) => {
-        if (status === 'OK' && results && results[0]) {
-          const marker = new window.google.maps.Marker({
-            map,
-            position: results[0].geometry.location,
-            title: `${price.commodity} - $${price.price}/${price.unit} (${price.is_organic ? 'Organic' : 'Non-organic'})`
-          });
+      // Use OpenStreetMap Nominatim API for geocoding
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(price.location)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data[0]) {
+            const marker = L.marker([parseFloat(data[0].lat), parseFloat(data[0].lon)])
+              .addTo(mapInstance.current!);
 
-          const infoWindow = new window.google.maps.InfoWindow({
-            content: `
+            marker.bindPopup(`
               <div>
                 <h3>${price.commodity}</h3>
                 <p>Price: $${price.price}/${price.unit}</p>
                 <p>${price.is_organic ? 'Organic' : 'Non-organic'}</p>
                 <p>Location: ${price.location}</p>
               </div>
-            `
-          });
+            `);
 
-          marker.addListener('click', () => {
-            infoWindow.open(map, marker);
-          });
-
-          markersRef.current.push(marker);
-        }
-      });
+            markersRef.current.push(marker);
+          }
+        })
+        .catch(error => console.error('Error geocoding location:', error));
     });
-  };
-
-  useEffect(() => {
-    const loadGoogleMaps = () => {
-      if (typeof window.google !== 'undefined') {
-        initializeMap();
-        return;
-      }
-
-      window.initMap = initializeMap;
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    };
-
-    loadGoogleMaps();
 
     return () => {
-      markersRef.current.forEach(marker => marker.setMap(null));
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+        markersRef.current = [];
+      }
     };
   }, [prices]);
 
   return (
     <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
       <div ref={mapRef} className="absolute inset-0" />
-      <div className="absolute top-0 left-0 bg-background/80 p-4 m-4 rounded-lg">
-        <p className="text-sm">
-          Note: To use Google Maps, you'll need to add your API key.
-        </p>
-      </div>
     </div>
   );
 };
