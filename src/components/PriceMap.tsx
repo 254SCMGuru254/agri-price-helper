@@ -12,6 +12,53 @@ const PriceMap = ({ prices }: PriceMapProps) => {
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
 
+  const initializeMap = () => {
+    if (!mapRef.current) return;
+
+    const map = new window.google.maps.Map(mapRef.current, {
+      center: { lat: 0, lng: 0 },
+      zoom: 2,
+    });
+    googleMapRef.current = map;
+
+    // Create a geocoder instance
+    const geocoder = new window.google.maps.Geocoder();
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current = [];
+
+    // Add markers for each price location
+    prices.forEach(price => {
+      geocoder.geocode({ address: price.location }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          const marker = new window.google.maps.Marker({
+            map,
+            position: results[0].geometry.location,
+            title: `${price.commodity} - $${price.price}/${price.unit} (${price.is_organic ? 'Organic' : 'Non-organic'})`
+          });
+
+          const infoWindow = new window.google.maps.InfoWindow({
+            content: `
+              <div>
+                <h3>${price.commodity}</h3>
+                <p>Price: $${price.price}/${price.unit}</p>
+                <p>${price.is_organic ? 'Organic' : 'Non-organic'}</p>
+                <p>Location: ${price.location}</p>
+              </div>
+            `
+          });
+
+          marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+          });
+
+          markersRef.current.push(marker);
+        }
+      });
+    });
+  };
+
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (typeof window.google !== 'undefined') {
@@ -25,53 +72,6 @@ const PriceMap = ({ prices }: PriceMapProps) => {
       script.async = true;
       script.defer = true;
       document.head.appendChild(script);
-    };
-
-    const initializeMap = () => {
-      if (!mapRef.current) return;
-
-      const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat: 0, lng: 0 },
-        zoom: 2,
-      });
-      googleMapRef.current = map;
-
-      // Create a geocoder instance
-      const geocoder = new window.google.maps.Geocoder();
-
-      // Clear existing markers
-      markersRef.current.forEach(marker => marker.setMap(null));
-      markersRef.current = [];
-
-      // Add markers for each price location
-      prices.forEach(price => {
-        geocoder.geocode({ address: price.location }, (results, status) => {
-          if (status === 'OK' && results && results[0]) {
-            const marker = new window.google.maps.Marker({
-              map,
-              position: results[0].geometry.location,
-              title: `${price.commodity} - $${price.price}/${price.unit} (${price.is_organic ? 'Organic' : 'Non-organic'})`
-            });
-
-            const infoWindow = new window.google.maps.InfoWindow({
-              content: `
-                <div>
-                  <h3>${price.commodity}</h3>
-                  <p>Price: $${price.price}/${price.unit}</p>
-                  <p>${price.is_organic ? 'Organic' : 'Non-organic'}</p>
-                  <p>Location: ${price.location}</p>
-                </div>
-              `
-            });
-
-            marker.addListener('click', () => {
-              infoWindow.open(map, marker);
-            });
-
-            markersRef.current.push(marker);
-          }
-        });
-      });
     };
 
     loadGoogleMaps();
