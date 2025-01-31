@@ -7,6 +7,12 @@ interface PriceMapProps {
   prices: MarketPrice[];
 }
 
+declare global {
+  interface Window {
+    initMap: () => void;
+  }
+}
+
 const PriceMap = ({ prices }: PriceMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
@@ -14,25 +20,30 @@ const PriceMap = ({ prices }: PriceMapProps) => {
 
   useEffect(() => {
     const loadGoogleMaps = () => {
+      if (typeof google !== 'undefined') {
+        initializeMap();
+        return;
+      }
+
+      window.initMap = initializeMap;
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=&callback=initMap`;
       script.async = true;
       script.defer = true;
-      script.addEventListener('load', initializeMap);
       document.head.appendChild(script);
     };
 
     const initializeMap = () => {
       if (!mapRef.current) return;
 
-      const map = new google.maps.Map(mapRef.current, {
+      const map = new window.google.maps.Map(mapRef.current, {
         center: { lat: 0, lng: 0 },
         zoom: 2,
       });
       googleMapRef.current = map;
 
       // Create a geocoder instance
-      const geocoder = new google.maps.Geocoder();
+      const geocoder = new window.google.maps.Geocoder();
 
       // Clear existing markers
       markersRef.current.forEach(marker => marker.setMap(null));
@@ -42,13 +53,13 @@ const PriceMap = ({ prices }: PriceMapProps) => {
       prices.forEach(price => {
         geocoder.geocode({ address: price.location }, (results, status) => {
           if (status === 'OK' && results && results[0]) {
-            const marker = new google.maps.Marker({
+            const marker = new window.google.maps.Marker({
               map,
               position: results[0].geometry.location,
               title: `${price.commodity} - $${price.price}/${price.unit} (${price.is_organic ? 'Organic' : 'Non-organic'})`
             });
 
-            const infoWindow = new google.maps.InfoWindow({
+            const infoWindow = new window.google.maps.InfoWindow({
               content: `
                 <div>
                   <h3>${price.commodity}</h3>
