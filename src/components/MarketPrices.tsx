@@ -4,14 +4,49 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import PriceMap from "./PriceMap";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
+type ExchangeRates = {
+  KES: number;
+  USD: number;
+  EUR: number;
+  GBP: number;
+};
 
 export const MarketPrices = () => {
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [loadingRates, setLoadingRates] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchExchangeRates = async () => {
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await response.json();
+        setExchangeRates({
+          KES: data.rates.KES,
+          USD: 1,
+          EUR: data.rates.EUR,
+          GBP: data.rates.GBP
+        });
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load exchange rates",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingRates(false);
+      }
+    };
+
+    fetchExchangeRates();
+  }, [toast]);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -37,7 +72,6 @@ export const MarketPrices = () => {
 
     fetchPrices();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel("market-prices-changes")
       .on(
@@ -62,7 +96,6 @@ export const MarketPrices = () => {
     return <div className="text-center">Loading market prices...</div>;
   }
 
-  // Separate organic and non-organic prices
   const organicPrices = prices.filter(price => price.is_organic);
   const nonOrganicPrices = prices.filter(price => !price.is_organic);
 
@@ -71,6 +104,7 @@ export const MarketPrices = () => {
       <TabsList>
         <TabsTrigger value="list">List View</TabsTrigger>
         <TabsTrigger value="map">Map View</TabsTrigger>
+        <TabsTrigger value="forex">Exchange Rates</TabsTrigger>
       </TabsList>
       
       <TabsContent value="list">
@@ -131,6 +165,43 @@ export const MarketPrices = () => {
       
       <TabsContent value="map">
         <PriceMap prices={prices} />
+      </TabsContent>
+
+      <TabsContent value="forex">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-6">Current Exchange Rates</h2>
+          {loadingRates ? (
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : exchangeRates ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="p-4 bg-primary/5">
+                <p className="text-sm text-muted-foreground">USD/KES</p>
+                <p className="text-2xl font-bold">{exchangeRates.KES.toFixed(2)}</p>
+              </Card>
+              <Card className="p-4 bg-primary/5">
+                <p className="text-sm text-muted-foreground">USD/EUR</p>
+                <p className="text-2xl font-bold">{exchangeRates.EUR.toFixed(2)}</p>
+              </Card>
+              <Card className="p-4 bg-primary/5">
+                <p className="text-sm text-muted-foreground">USD/GBP</p>
+                <p className="text-2xl font-bold">{exchangeRates.GBP.toFixed(2)}</p>
+              </Card>
+              <Card className="p-4 bg-primary/5">
+                <p className="text-sm text-muted-foreground">Base Currency</p>
+                <p className="text-2xl font-bold">USD</p>
+              </Card>
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground">Failed to load exchange rates</p>
+          )}
+          <p className="text-sm text-muted-foreground mt-4">
+            Exchange rates are updated daily. Last updated: {new Date().toLocaleDateString()}
+          </p>
+        </Card>
       </TabsContent>
     </Tabs>
   );
