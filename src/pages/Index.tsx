@@ -6,6 +6,7 @@ import { ExpertQA } from "@/components/ExpertQA";
 import { CommunityForum } from "@/components/CommunityForum";
 import { SuccessStories } from "@/components/SuccessStories";
 import { UserPoints } from "@/components/UserPoints";
+import { WeatherUpdates } from "@/components/WeatherUpdates";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
         <Hero />
         <UserPoints />
         <div className="py-12 space-y-16">
+          <WeatherUpdates />
           <ExpertQA />
           <CommunityForum />
           <SuccessStories />
