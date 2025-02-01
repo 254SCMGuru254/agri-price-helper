@@ -7,6 +7,7 @@ import PriceMap from "./PriceMap";
 import { CarouselView } from "./market-prices/CarouselView";
 import { ListView } from "./market-prices/ListView";
 import { ExchangeRatesView } from "./market-prices/ExchangeRatesView";
+import { PriceTicker } from "./market-prices/PriceTicker";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 type ExchangeRates = {
@@ -22,6 +23,15 @@ export const MarketPrices = () => {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
   const [loadingRates, setLoadingRates] = useState(true);
   const { toast } = useToast();
+
+  // Group prices by location
+  const pricesByLocation = prices.reduce((acc, price) => {
+    if (!acc[price.location]) {
+      acc[price.location] = [];
+    }
+    acc[price.location].push(price);
+    return acc;
+  }, {} as Record<string, MarketPrice[]>);
 
   useEffect(() => {
     const fetchExchangeRates = async () => {
@@ -73,17 +83,30 @@ export const MarketPrices = () => {
 
     fetchPrices();
 
+    // Subscribe to real-time updates
     const channel = supabase
       .channel("market-prices-changes")
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*", // Listen to all changes
           schema: "public",
           table: "market_prices",
         },
         (payload) => {
-          setPrices((current) => [payload.new as MarketPrice, ...current]);
+          if (payload.eventType === "INSERT") {
+            setPrices((current) => [payload.new as MarketPrice, ...current]);
+          } else if (payload.eventType === "UPDATE") {
+            setPrices((current) =>
+              current.map((price) =>
+                price.id === payload.new.id ? (payload.new as MarketPrice) : price
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setPrices((current) =>
+              current.filter((price) => price.id !== payload.old.id)
+            );
+          }
         }
       )
       .subscribe();
@@ -98,32 +121,40 @@ export const MarketPrices = () => {
   }
 
   return (
-    <Tabs defaultValue="carousel" className="space-y-4">
-      <TabsList>
-        <TabsTrigger value="carousel">Carousel View</TabsTrigger>
-        <TabsTrigger value="list">List View</TabsTrigger>
-        <TabsTrigger value="map">Map View</TabsTrigger>
-        <TabsTrigger value="forex">Exchange Rates</TabsTrigger>
-      </TabsList>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        {Object.entries(pricesByLocation).map(([location, locationPrices]) => (
+          <PriceTicker key={location} location={location} prices={locationPrices} />
+        ))}
+      </div>
 
-      <TabsContent value="carousel">
-        <CarouselView prices={prices} />
-      </TabsContent>
-      
-      <TabsContent value="list">
-        <ListView prices={prices} />
-      </TabsContent>
-      
-      <TabsContent value="map">
-        <PriceMap prices={prices} />
-      </TabsContent>
+      <Tabs defaultValue="carousel" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="carousel">Carousel View</TabsTrigger>
+          <TabsTrigger value="list">List View</TabsTrigger>
+          <TabsTrigger value="map">Map View</TabsTrigger>
+          <TabsTrigger value="forex">Exchange Rates</TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="forex">
-        <ExchangeRatesView 
-          exchangeRates={exchangeRates}
-          loadingRates={loadingRates}
-        />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="carousel">
+          <CarouselView prices={prices} />
+        </TabsContent>
+        
+        <TabsContent value="list">
+          <ListView prices={prices} />
+        </TabsContent>
+        
+        <TabsContent value="map">
+          <PriceMap prices={prices} />
+        </TabsContent>
+
+        <TabsContent value="forex">
+          <ExchangeRatesView 
+            exchangeRates={exchangeRates}
+            loadingRates={loadingRates}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
