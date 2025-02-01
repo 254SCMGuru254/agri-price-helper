@@ -50,6 +50,98 @@ export type Database = {
           },
         ]
       }
+      expert_qa: {
+        Row: {
+          answer: string | null
+          answered_by: string | null
+          asked_by: string
+          category: string
+          created_at: string
+          id: string
+          question: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_by?: string | null
+          asked_by: string
+          category: string
+          created_at?: string
+          id?: string
+          question: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string | null
+          answered_by?: string | null
+          asked_by?: string
+          category?: string
+          created_at?: string
+          id?: string
+          question?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_qa_answered_by_fkey"
+            columns: ["answered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_qa_asked_by_fkey"
+            columns: ["asked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_posts: {
+        Row: {
+          author_id: string
+          category: string
+          content: string
+          created_at: string
+          id: string
+          likes_count: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_prices: {
         Row: {
           commodity: string
@@ -168,6 +260,44 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      success_stories: {
+        Row: {
+          content: string
+          created_at: string
+          farmer_id: string
+          id: string
+          likes_count: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          farmer_id: string
+          id?: string
+          likes_count?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          farmer_id?: string
+          id?: string
+          likes_count?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "success_stories_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_rewards: {
         Row: {
