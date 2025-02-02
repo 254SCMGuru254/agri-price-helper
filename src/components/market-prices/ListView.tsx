@@ -1,13 +1,16 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Share2, CheckCircle2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 
 interface ListViewProps {
   prices: MarketPrice[];
+  onShare: (price: MarketPrice) => void;
 }
 
-export const ListView = ({ prices }: ListViewProps) => {
+export const ListView = ({ prices, onShare }: ListViewProps) => {
   const organicPrices = prices.filter(price => price.is_organic);
   const nonOrganicPrices = prices.filter(price => !price.is_organic);
 
@@ -18,7 +21,21 @@ export const ListView = ({ prices }: ListViewProps) => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {organicPrices.map((price) => (
             <Card key={price.id} className="p-4">
-              <h3 className="font-semibold text-lg">{price.commodity}</h3>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">{price.commodity}</h3>
+                  {price.verified_at && (
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onShare(price)}
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
               <div className="mt-2 space-y-1 text-sm">
                 <p className="text-2xl font-bold">
                   ${price.price} / {price.unit}
@@ -44,7 +61,21 @@ export const ListView = ({ prices }: ListViewProps) => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {nonOrganicPrices.map((price) => (
             <Card key={price.id} className="p-4">
-              <h3 className="font-semibold text-lg">{price.commodity}</h3>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">{price.commodity}</h3>
+                  {price.verified_at && (
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onShare(price)}
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
               <div className="mt-2 space-y-1 text-sm">
                 <p className="text-2xl font-bold">
                   ${price.price} / {price.unit}

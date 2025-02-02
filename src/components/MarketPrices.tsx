@@ -3,11 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Share2, Check, X } from "lucide-react";
+import { MarketFilters } from "./market-prices/MarketFilters";
 import PriceMap from "./PriceMap";
 import { CarouselView } from "./market-prices/CarouselView";
 import { ListView } from "./market-prices/ListView";
@@ -16,23 +12,21 @@ import { PriceTicker } from "./market-prices/PriceTicker";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 type Category = Database["public"]["Tables"]["commodity_categories"]["Row"];
-type ExchangeRates = {
-  KES: number;
-  USD: number;
-  EUR: number;
-  GBP: number;
-};
 
 export const MarketPrices = () => {
   const [prices, setPrices] = useState<MarketPrice[]>([]);
   const [filteredPrices, setFilteredPrices] = useState<MarketPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [exchangeRates, setExchangeRates] = useState<{
+    KES: number;
+    USD: number;
+    EUR: number;
+    GBP: number;
+  } | null>(null);
   const [loadingRates, setLoadingRates] = useState(true);
   const { toast } = useToast();
 
-  // Filter states
   const [filters, setFilters] = useState({
     search: "",
     category: "",
@@ -61,7 +55,6 @@ export const MarketPrices = () => {
     fetchCategories();
   }, []);
 
-  // Apply filters
   useEffect(() => {
     let filtered = [...prices];
 
@@ -102,15 +95,6 @@ export const MarketPrices = () => {
 
     setFilteredPrices(filtered);
   }, [filters, prices]);
-
-  // Group prices by location
-  const pricesByLocation = filteredPrices.reduce((acc, price) => {
-    if (!acc[price.location]) {
-      acc[price.location] = [];
-    }
-    acc[price.location].push(price);
-    return acc;
-  }, {} as Record<string, MarketPrice[]>);
 
   useEffect(() => {
     const fetchExchangeRates = async () => {
@@ -163,7 +147,6 @@ export const MarketPrices = () => {
 
     fetchPrices();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel("market-prices-changes")
       .on(
@@ -224,74 +207,22 @@ export const MarketPrices = () => {
     return <div className="text-center">Loading market prices...</div>;
   }
 
+  const pricesByLocation = filteredPrices.reduce((acc, price) => {
+    if (!acc[price.location]) {
+      acc[price.location] = [];
+    }
+    acc[price.location].push(price);
+    return acc;
+  }, {} as Record<string, MarketPrice[]>);
+
   return (
     <div className="space-y-4">
       <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 p-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Input
-            placeholder="Search commodities..."
-            value={filters.search}
-            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-          />
-          <Select
-            value={filters.category}
-            onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            type="number"
-            placeholder="Min price"
-            value={filters.minPrice}
-            onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
-          />
-          <Input
-            type="number"
-            placeholder="Max price"
-            value={filters.maxPrice}
-            onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
-          />
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          <Badge
-            variant={filters.isOrganic === true ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setFilters(prev => ({ ...prev, isOrganic: prev.isOrganic === true ? null : true }))}
-          >
-            Organic
-          </Badge>
-          <Badge
-            variant={filters.isOrganic === false ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setFilters(prev => ({ ...prev, isOrganic: prev.isOrganic === false ? null : false }))}
-          >
-            Non-Organic
-          </Badge>
-          <Badge
-            variant={filters.isVerified === true ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setFilters(prev => ({ ...prev, isVerified: prev.isVerified === true ? null : true }))}
-          >
-            Verified
-          </Badge>
-          <Badge
-            variant={filters.isVerified === false ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setFilters(prev => ({ ...prev, isVerified: prev.isVerified === false ? null : false }))}
-          >
-            Unverified
-          </Badge>
-        </div>
+        <MarketFilters
+          filters={filters}
+          categories={categories}
+          onFilterChange={(newFilters) => setFilters(prev => ({ ...prev, ...newFilters }))}
+        />
       </div>
 
       <div className="space-y-2">
