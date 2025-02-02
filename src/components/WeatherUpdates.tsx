@@ -40,23 +40,35 @@ export const WeatherUpdates = () => {
           });
         },
         (error) => {
-          console.log("Error getting location:", error);
+          console.error("Error getting location:", error);
+          // Keep default location when there's an error
         }
       );
     }
   }, []);
 
-  const { data: weather, isLoading } = useQuery({
+  const { data: weather, isLoading, error } = useQuery({
     queryKey: ["weather", location],
     queryFn: async () => {
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`
       );
+      if (!response.ok) {
+        throw new Error('Failed to fetch weather data');
+      }
       return response.json() as Promise<WeatherData>;
     },
   });
 
-  if (isLoading) {
+  if (error) {
+    return (
+      <Card className="p-6">
+        <p className="text-red-500">Failed to load weather data. Please try again later.</p>
+      </Card>
+    );
+  }
+
+  if (isLoading || !weather) {
     return (
       <Card className="p-6">
         <div className="animate-pulse flex space-x-4">
@@ -74,8 +86,6 @@ export const WeatherUpdates = () => {
       </Card>
     );
   }
-
-  if (!weather) return null;
 
   return (
     <div className="space-y-4">
