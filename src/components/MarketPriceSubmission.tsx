@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,18 +7,41 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
+import type { Database } from "@/integrations/supabase/types";
+
+type Category = Database["public"]["Tables"]["commodity_categories"]["Row"];
 
 export const MarketPriceSubmission = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     commodity: "",
     price: "",
     unit: "kg",
     location: "",
     is_organic: false,
+    category_id: "",
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from("commodity_categories")
+        .select("*")
+        .order("name");
+      
+      if (error) {
+        console.error("Error fetching categories:", error);
+        return;
+      }
+      
+      setCategories(data);
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +63,7 @@ export const MarketPriceSubmission = () => {
         location: formData.location,
         is_organic: formData.is_organic,
         submitted_by: user.id,
+        category_id: formData.category_id || null,
       });
 
       if (error) throw error;
@@ -55,6 +79,7 @@ export const MarketPriceSubmission = () => {
         unit: "kg",
         location: "",
         is_organic: false,
+        category_id: "",
       });
     } catch (error) {
       console.error("Error submitting market price:", error);
@@ -70,6 +95,27 @@ export const MarketPriceSubmission = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
+      <div className="space-y-2">
+        <Label htmlFor="category">Category</Label>
+        <Select
+          value={formData.category_id}
+          onValueChange={(value) =>
+            setFormData((prev) => ({ ...prev, category_id: value }))
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="commodity">Commodity</Label>
         <Input

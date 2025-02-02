@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Share2, CheckCircle2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
@@ -8,9 +9,10 @@ type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 interface PriceCarouselProps {
   prices: MarketPrice[];
   title: string;
+  onShare: (price: MarketPrice) => void;
 }
 
-export const PriceCarousel = ({ prices, title }: PriceCarouselProps) => {
+export const PriceCarousel = ({ prices, title, onShare }: PriceCarouselProps) => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">{title}</h2>
@@ -27,13 +29,25 @@ export const PriceCarousel = ({ prices, title }: PriceCarouselProps) => {
               <CarouselItem key={price.id} className="md:basis-1/2 lg:basis-1/3">
                 <Card className="p-4">
                   <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-lg">{price.commodity}</h3>
-                    <div className="flex items-center space-x-1 text-sm">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg">{price.commodity}</h3>
+                      {price.verified_at && (
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
                       {Math.random() > 0.5 ? (
                         <TrendingUp className="h-4 w-4 text-green-500" />
                       ) : (
                         <TrendingDown className="h-4 w-4 text-red-500" />
                       )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onShare(price)}
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                   <div className="mt-2 space-y-1 text-sm">

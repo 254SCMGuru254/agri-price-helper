@@ -50,6 +50,30 @@ export type Database = {
           },
         ]
       }
+      commodity_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       expert_qa: {
         Row: {
           answer: string | null
@@ -144,6 +168,7 @@ export type Database = {
       }
       market_prices: {
         Row: {
+          category_id: string | null
           commodity: string
           created_at: string
           id: string
@@ -154,9 +179,12 @@ export type Database = {
           submitted_by: string
           unit: string
           updated_at: string
+          verified_at: string | null
+          verified_by: string | null
           votes_count: number | null
         }
         Insert: {
+          category_id?: string | null
           commodity: string
           created_at?: string
           id?: string
@@ -167,9 +195,12 @@ export type Database = {
           submitted_by: string
           unit: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
           votes_count?: number | null
         }
         Update: {
+          category_id?: string | null
           commodity?: string
           created_at?: string
           id?: string
@@ -180,12 +211,28 @@ export type Database = {
           submitted_by?: string
           unit?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
           votes_count?: number | null
         }
         Relationships: [
           {
+            foreignKeyName: "market_prices_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "market_prices_submitted_by_fkey"
             columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_prices_verified_by_fkey"
+            columns: ["verified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

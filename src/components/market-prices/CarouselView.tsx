@@ -5,9 +5,10 @@ type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 
 interface CarouselViewProps {
   prices: MarketPrice[];
+  onShare: (price: MarketPrice) => void;
 }
 
-export const CarouselView = ({ prices }: CarouselViewProps) => {
+export const CarouselView = ({ prices, onShare }: CarouselViewProps) => {
   const organicPrices = prices.filter(price => price.is_organic);
   const nonOrganicPrices = prices.filter(price => !price.is_organic);
   const pricesByLocation = prices.reduce((acc, price) => {
@@ -20,8 +21,8 @@ export const CarouselView = ({ prices }: CarouselViewProps) => {
 
   return (
     <div className="space-y-8">
-      <PriceCarousel prices={organicPrices} title="Organic Products" />
-      <PriceCarousel prices={nonOrganicPrices} title="Non-Organic Products" />
+      <PriceCarousel prices={organicPrices} title="Organic Products" onShare={onShare} />
+      <PriceCarousel prices={nonOrganicPrices} title="Non-Organic Products" onShare={onShare} />
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Prices by Location</h2>
         {Object.entries(pricesByLocation).map(([location, locationPrices]) => (
@@ -29,6 +30,7 @@ export const CarouselView = ({ prices }: CarouselViewProps) => {
             key={location}
             prices={locationPrices}
             title={`Market Prices in ${location}`}
+            onShare={onShare}
           />
         ))}
       </div>
