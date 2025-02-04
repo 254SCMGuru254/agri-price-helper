@@ -47,43 +47,54 @@ export const WeatherUpdates = () => {
     }
   }, []);
 
+  const fetchWeatherData = async ({ queryKey }: { queryKey: [string, { lat: number; lon: number }] }): Promise<WeatherData> => {
+    const [_, locationData] = queryKey;
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${locationData.lat}&longitude=${locationData.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch weather data');
+    }
+    return response.json();
+  };
+
   const { data: weather, isLoading, error } = useQuery({
     queryKey: ["weather", location],
-    queryFn: async () => {
-      const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch weather data');
-      }
-      return response.json() as Promise<WeatherData>;
-    },
+    queryFn: fetchWeatherData,
+    retry: 2,
+    staleTime: 300000, // 5 minutes
   });
 
   if (error) {
     return (
-      <Card className="p-6">
-        <p className="text-red-500">Failed to load weather data. Please try again later.</p>
-      </Card>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold mb-4">Weather Updates</h2>
+        <Card className="p-6">
+          <p className="text-red-500">Failed to load weather data. Please try again later.</p>
+        </Card>
+      </div>
     );
   }
 
   if (isLoading || !weather) {
     return (
-      <Card className="p-6">
-        <div className="animate-pulse flex space-x-4">
-          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
-          <div className="flex-1 space-y-6 py-1">
-            <div className="h-2 bg-slate-200 rounded"></div>
-            <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="h-2 bg-slate-200 rounded col-span-2"></div>
-                <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold mb-4">Weather Updates</h2>
+        <Card className="p-6">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+            <div className="flex-1 space-y-6 py-1">
+              <div className="h-2 bg-slate-200 rounded"></div>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="h-2 bg-slate-200 rounded col-span-2"></div>
+                  <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     );
   }
 

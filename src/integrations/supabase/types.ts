@@ -9,6 +9,32 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ad_watches: {
+        Row: {
+          id: string
+          user_id: string
+          watched_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          watched_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          watched_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_watches_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agricultural_advice: {
         Row: {
           author_id: string
@@ -278,6 +304,53 @@ export type Database = {
           },
         ]
       }
+      product_listings: {
+        Row: {
+          contact_info: string
+          created_at: string
+          description: string
+          expires_at: string | null
+          id: string
+          price: number | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_info: string
+          created_at?: string
+          description: string
+          expires_at?: string | null
+          id?: string
+          price?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_info?: string
+          created_at?: string
+          description?: string
+          expires_at?: string | null
+          id?: string
+          price?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -386,7 +459,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_create_product_listing: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       price_status: "pending" | "approved" | "rejected"
