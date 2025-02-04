@@ -18,20 +18,21 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Welcome back!",
-        description: "Successfully signed in.",
-      });
-
-      navigate("/onboarding");
-    } catch (error) {
+      if (data.user) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in.",
+        });
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -46,18 +47,20 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Welcome!",
-        description: "Check your email to confirm your account.",
-      });
-    } catch (error) {
+      if (data.user) {
+        toast({
+          title: "Welcome!",
+          description: "Check your email to confirm your account.",
+        });
+      }
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -107,11 +110,7 @@ const Auth = () => {
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Loading..." : "Sign In"}
           </Button>
         </form>
