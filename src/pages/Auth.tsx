@@ -11,6 +11,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -26,47 +27,35 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        toast({
-          title: "Welcome back!",
-          description: "Successfully signed in.",
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
         });
-        navigate("/dashboard");
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleSignUp = async () => {
-    setLoading(true);
+        if (error) throw error;
 
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        toast({
-          title: "Welcome!",
-          description: "Check your email to confirm your account.",
+        if (data.user) {
+          toast({
+            title: "Success!",
+            description: "Please check your email to confirm your account.",
+          });
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
         });
+
+        if (error) throw error;
+
+        if (data.user) {
+          toast({
+            title: "Welcome back!",
+            description: "Successfully signed in.",
+          });
+          navigate("/dashboard");
+        }
       }
     } catch (error: any) {
       toast({
@@ -85,7 +74,7 @@ const Auth = () => {
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Welcome</h1>
           <p className="text-muted-foreground">
-            Sign in to access market prices and agricultural advice
+            {isSignUp ? "Create an account" : "Sign in to your account"}
           </p>
         </div>
 
@@ -119,20 +108,20 @@ const Auth = () => {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Loading..." : "Sign In"}
+            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
           </Button>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
             <Button
               variant="link"
               className="p-0"
-              onClick={handleSignUp}
+              onClick={() => setIsSignUp(!isSignUp)}
               disabled={loading}
             >
-              Sign Up
+              {isSignUp ? "Sign In" : "Sign Up"}
             </Button>
           </p>
         </div>
