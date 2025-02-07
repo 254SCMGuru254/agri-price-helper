@@ -1,14 +1,23 @@
+
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "./LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleSignOut = async () => {
     try {
@@ -36,22 +45,41 @@ export const Navbar = () => {
           
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-foreground/80 hover:text-primary transition-colors">
-              Features
+              {t('nav.features')}
             </a>
             <a href="#how-it-works" className="text-foreground/80 hover:text-primary transition-colors">
-              How it Works
+              {t('nav.howItWorks')}
             </a>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Globe className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage('en')}>
+                  🇬🇧 English {language === 'en' && '✓'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('sw')}>
+                  🇰🇪 Kiswahili {language === 'sw' && '✓'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {user ? (
               <Button variant="outline" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                {t('nav.signOut')}
               </Button>
             ) : (
               <>
                 <Button variant="outline" onClick={() => navigate("/auth")}>
-                  Sign In
+                  {t('nav.signIn')}
                 </Button>
-                <Button onClick={() => navigate("/auth")}>Get Started</Button>
+                <Button onClick={() => navigate("/auth")}>
+                  {t('nav.getStarted')}
+                </Button>
               </>
             )}
           </div>

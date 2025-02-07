@@ -76,6 +76,42 @@ export type Database = {
           },
         ]
       }
+      cold_storage_facilities: {
+        Row: {
+          available_space: string
+          capacity: string
+          contact: string
+          created_at: string
+          features: string[] | null
+          id: string
+          location: string
+          name: string
+          rates_per_day: number
+        }
+        Insert: {
+          available_space: string
+          capacity: string
+          contact: string
+          created_at?: string
+          features?: string[] | null
+          id?: string
+          location: string
+          name: string
+          rates_per_day: number
+        }
+        Update: {
+          available_space?: string
+          capacity?: string
+          contact?: string
+          created_at?: string
+          features?: string[] | null
+          id?: string
+          location?: string
+          name?: string
+          rates_per_day?: number
+        }
+        Relationships: []
+      }
       commodity_categories: {
         Row: {
           created_at: string
@@ -99,6 +135,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      crop_calendars: {
+        Row: {
+          created_at: string
+          crop_name: string
+          harvest_date: string
+          id: string
+          notes: string | null
+          planting_date: string
+          region: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          crop_name: string
+          harvest_date: string
+          id?: string
+          notes?: string | null
+          planting_date: string
+          region: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          crop_name?: string
+          harvest_date?: string
+          id?: string
+          notes?: string | null
+          planting_date?: string
+          region?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crop_calendars_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expert_qa: {
         Row: {
@@ -191,6 +271,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      logistics_providers: {
+        Row: {
+          capacity: string
+          contact: string
+          created_at: string
+          id: string
+          name: string
+          rates_per_km: number
+          regions_served: string[]
+          vehicle_type: string
+          verified: boolean | null
+        }
+        Insert: {
+          capacity: string
+          contact: string
+          created_at?: string
+          id?: string
+          name: string
+          rates_per_km: number
+          regions_served: string[]
+          vehicle_type: string
+          verified?: boolean | null
+        }
+        Update: {
+          capacity?: string
+          contact?: string
+          created_at?: string
+          id?: string
+          name?: string
+          rates_per_km?: number
+          regions_served?: string[]
+          vehicle_type?: string
+          verified?: boolean | null
+        }
+        Relationships: []
       }
       market_prices: {
         Row: {
@@ -418,6 +534,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      translations: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          language_code: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          language_code: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          language_code?: string
+          value?: string
+        }
+        Relationships: []
       }
       user_rewards: {
         Row: {
