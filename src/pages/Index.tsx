@@ -1,3 +1,4 @@
+
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
@@ -7,6 +8,7 @@ import { CommunityForum } from "@/components/CommunityForum";
 import { SuccessStories } from "@/components/SuccessStories";
 import { UserPoints } from "@/components/UserPoints";
 import { WeatherUpdates } from "@/components/WeatherUpdates";
+import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
 
 const Index = () => {
   return (
@@ -17,6 +19,7 @@ const Index = () => {
         <UserPoints />
         <div className="py-12 space-y-16">
           <WeatherUpdates />
+          <AgriTimeSeriesChart />
           <ExpertQA />
           <CommunityForum />
           <SuccessStories />

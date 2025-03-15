@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState } from "react";
 
 type LanguageContextType = {
@@ -15,6 +14,8 @@ const translations = {
     'nav.signIn': 'Sign In',
     'nav.getStarted': 'Get Started',
     'nav.language': 'Language',
+    'stats.timeSeriesTitle': 'Agricultural Time Series',
+    'errors.failedToLoadStats': 'Failed to load agricultural statistics'
   },
   sw: {
     'nav.features': 'Vipengele',
@@ -23,6 +24,8 @@ const translations = {
     'nav.signIn': 'Ingia',
     'nav.getStarted': 'Anza',
     'nav.language': 'Lugha',
+    'stats.timeSeriesTitle': 'Takwimu za Kilimo',
+    'errors.failedToLoadStats': 'Imeshindwa kupakua takwimu za kilimo'
   }
 };
 
