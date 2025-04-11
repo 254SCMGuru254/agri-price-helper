@@ -1,13 +1,15 @@
+
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/components/AuthProvider";
-import { Award, TrendingUp, BookOpen } from "lucide-react";
+import { Award, TrendingUp, BookOpen, LineChart } from "lucide-react";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
 import { MarketPrices } from "@/components/MarketPrices";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -82,8 +84,18 @@ const Dashboard = () => {
           </Card>
         </div>
 
+        <div className="mb-8">
+          <Card className="p-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <LineChart className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Agricultural Trends</h2>
+            </div>
+            <AgriTimeSeriesChart />
+          </Card>
+        </div>
+
         <Tabs defaultValue="view" className="space-y-4">
-          <TabsList>
+          <TabsList className="w-full md:w-auto">
             <TabsTrigger value="view">View Market Prices</TabsTrigger>
             <TabsTrigger value="submit">Submit Price</TabsTrigger>
           </TabsList>

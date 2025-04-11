@@ -17,9 +17,11 @@ const Index = () => {
       <main className="container mx-auto px-4">
         <Hero />
         <UserPoints />
-        <div className="py-12 space-y-16">
-          <WeatherUpdates />
+        <div className="py-8">
           <AgriTimeSeriesChart />
+        </div>
+        <div className="py-8 space-y-16">
+          <WeatherUpdates />
           <ExpertQA />
           <CommunityForum />
           <SuccessStories />
