@@ -18,7 +18,7 @@ import {
 } from "recharts";
 import { useState } from "react";
 import { useLanguage } from "./LanguageContext";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Filter } from "lucide-react";
 import { useMemo } from "react";
@@ -76,6 +76,11 @@ export const AgriTimeSeriesChart = () => {
   }
 
   const handleResetFilter = () => setYearFilter(null);
+
+  // Custom tooltip formatter
+  const formatTooltip = (value: number) => {
+    return value.toLocaleString();
+  };
 
   return (
     <Card className="p-6">
@@ -166,13 +171,9 @@ export const AgriTimeSeriesChart = () => {
                     offset: 10
                   }} 
                 />
-                <ChartTooltip
-                  content={(props) => (
-                    <ChartTooltipContent
-                      {...props}
-                      labelFormatter={(value) => `Year: ${value}`}
-                    />
-                  )}
+                <Tooltip 
+                  formatter={formatTooltip}
+                  labelFormatter={(value) => `Year: ${value}`}
                 />
                 <Legend />
                 <Line
@@ -204,13 +205,9 @@ export const AgriTimeSeriesChart = () => {
                     offset: 10
                   }} 
                 />
-                <ChartTooltip
-                  content={(props) => (
-                    <ChartTooltipContent
-                      {...props}
-                      labelFormatter={(value) => `Year: ${value}`}
-                    />
-                  )}
+                <Tooltip 
+                  formatter={formatTooltip}
+                  labelFormatter={(value) => `Year: ${value}`}
                 />
                 <Legend />
                 <Bar
@@ -240,13 +237,9 @@ export const AgriTimeSeriesChart = () => {
                     offset: 10
                   }} 
                 />
-                <ChartTooltip
-                  content={(props) => (
-                    <ChartTooltipContent
-                      {...props}
-                      labelFormatter={(value) => `Year: ${value}`}
-                    />
-                  )}
+                <Tooltip 
+                  formatter={formatTooltip}
+                  labelFormatter={(value) => `Year: ${value}`}
                 />
                 <Legend />
                 <Area
