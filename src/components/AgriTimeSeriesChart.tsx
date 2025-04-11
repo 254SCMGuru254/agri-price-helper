@@ -18,8 +18,7 @@ import {
 } from "recharts";
 import { useState } from "react";
 import { useLanguage } from "./LanguageContext";
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartContainer } from "@/components/ui/chart";
 import { BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Filter } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,10 @@ export const AgriTimeSeriesChart = () => {
   
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['agriStats'],
-    queryFn: KenyaAgriStatsService.fetchStats
+    queryFn: KenyaAgriStatsService.fetchStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    retry: 3, // Retry 3 times on failure
   });
 
   // Process data for better visualization
