@@ -167,11 +167,12 @@ export const AgriTimeSeriesChart = () => {
                   }} 
                 />
                 <ChartTooltip
-                  content={
+                  content={(props) => (
                     <ChartTooltipContent
+                      {...props}
                       labelFormatter={(value) => `Year: ${value}`}
                     />
-                  }
+                  )}
                 />
                 <Legend />
                 <Line
@@ -204,11 +205,12 @@ export const AgriTimeSeriesChart = () => {
                   }} 
                 />
                 <ChartTooltip
-                  content={
+                  content={(props) => (
                     <ChartTooltipContent
+                      {...props}
                       labelFormatter={(value) => `Year: ${value}`}
                     />
-                  }
+                  )}
                 />
                 <Legend />
                 <Bar
@@ -239,11 +241,12 @@ export const AgriTimeSeriesChart = () => {
                   }} 
                 />
                 <ChartTooltip
-                  content={
+                  content={(props) => (
                     <ChartTooltipContent
+                      {...props}
                       labelFormatter={(value) => `Year: ${value}`}
                     />
-                  }
+                  )}
                 />
                 <Legend />
                 <Area
