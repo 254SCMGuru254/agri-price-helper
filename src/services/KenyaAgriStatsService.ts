@@ -92,15 +92,20 @@ export const KenyaAgriStatsService = {
         return REAL_KENYA_STATS;
       }
       
-      const data = await response.json();
-      
-      // Check if the API returned valid data we can use
-      if (!Array.isArray(data) || !data.length || !data[0]?.value) {
-        console.warn('API did not return usable data. Using real data instead.');
+      try {
+        const data = await response.json();
+        
+        // Check if the API returned valid data we can use
+        if (!Array.isArray(data) || !data.length || !data[0]?.value) {
+          console.warn('API did not return usable data. Using real data instead.');
+          return REAL_KENYA_STATS;
+        }
+        
+        return sanitizeData(data);
+      } catch (parseError) {
+        console.error('Error parsing API response:', parseError);
         return REAL_KENYA_STATS;
       }
-      
-      return sanitizeData(data);
     } catch (error) {
       console.error('Error fetching agricultural statistics:', error);
       
