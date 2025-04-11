@@ -79,9 +79,14 @@ export const AgriTimeSeriesChart = () => {
 
   const handleResetFilter = () => setYearFilter(null);
 
-  // Custom tooltip formatter
+  // Custom tooltip formatter for displaying values properly
   const formatTooltip = (value: number) => {
     return value.toLocaleString();
+  };
+
+  // Format label for tooltip
+  const formatLabel = (label: any) => {
+    return `Year: ${label}`;
   };
 
   return (
@@ -154,107 +159,105 @@ export const AgriTimeSeriesChart = () => {
             }
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            {chartType === 'line' && (
-              <LineChart
-                data={processedData}
-                margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="year"
-                  label={{ value: 'Year', position: 'bottom', offset: 0 }}
-                />
-                <YAxis 
-                  label={{ 
-                    value: 'Value', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    offset: 10
-                  }} 
-                />
-                <Tooltip 
-                  formatter={formatTooltip}
-                  labelFormatter={(value) => `Year: ${value}`}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  name={t('stats.agriculturalData') || 'Agricultural Data'}
-                  stroke="var(--color-value)"
-                  strokeWidth={2}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            )}
-            
-            {chartType === 'bar' && (
-              <BarChart
-                data={processedData}
-                margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="year"
-                  label={{ value: 'Year', position: 'bottom', offset: 0 }}
-                />
-                <YAxis 
-                  label={{ 
-                    value: 'Value', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    offset: 10
-                  }} 
-                />
-                <Tooltip 
-                  formatter={formatTooltip}
-                  labelFormatter={(value) => `Year: ${value}`}
-                />
-                <Legend />
-                <Bar
-                  dataKey="value"
-                  name={t('stats.agriculturalData') || 'Agricultural Data'}
-                  fill="var(--color-value)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            )}
-            
-            {chartType === 'area' && (
-              <AreaChart
-                data={processedData}
-                margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="year"
-                  label={{ value: 'Year', position: 'bottom', offset: 0 }}
-                />
-                <YAxis 
-                  label={{ 
-                    value: 'Value', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    offset: 10
-                  }} 
-                />
-                <Tooltip 
-                  formatter={formatTooltip}
-                  labelFormatter={(value) => `Year: ${value}`}
-                />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  name={t('stats.agriculturalData') || 'Agricultural Data'}
-                  stroke="var(--color-value)"
-                  fill="var(--color-value)"
-                  fillOpacity={0.3}
-                />
-              </AreaChart>
-            )}
-          </ResponsiveContainer>
+          {chartType === 'line' && (
+            <LineChart
+              data={processedData}
+              margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="year"
+                label={{ value: 'Year', position: 'bottom', offset: 0 }}
+              />
+              <YAxis 
+                label={{ 
+                  value: 'Value', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  offset: 10
+                }} 
+              />
+              <Tooltip 
+                formatter={formatTooltip}
+                labelFormatter={formatLabel}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={t('stats.agriculturalData') || 'Agricultural Data'}
+                stroke="var(--color-value)"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          )}
+          
+          {chartType === 'bar' && (
+            <BarChart
+              data={processedData}
+              margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="year"
+                label={{ value: 'Year', position: 'bottom', offset: 0 }}
+              />
+              <YAxis 
+                label={{ 
+                  value: 'Value', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  offset: 10
+                }} 
+              />
+              <Tooltip 
+                formatter={formatTooltip}
+                labelFormatter={formatLabel}
+              />
+              <Legend />
+              <Bar
+                dataKey="value"
+                name={t('stats.agriculturalData') || 'Agricultural Data'}
+                fill="var(--color-value)"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          )}
+          
+          {chartType === 'area' && (
+            <AreaChart
+              data={processedData}
+              margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="year"
+                label={{ value: 'Year', position: 'bottom', offset: 0 }}
+              />
+              <YAxis 
+                label={{ 
+                  value: 'Value', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  offset: 10
+                }} 
+              />
+              <Tooltip 
+                formatter={formatTooltip}
+                labelFormatter={formatLabel}
+              />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="value"
+                name={t('stats.agriculturalData') || 'Agricultural Data'}
+                stroke="var(--color-value)"
+                fill="var(--color-value)"
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          )}
         </ChartContainer>
       </div>
       
