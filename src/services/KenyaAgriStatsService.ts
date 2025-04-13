@@ -112,5 +112,17 @@ export const KenyaAgriStatsService = {
       // Return real data in case of error
       return REAL_KENYA_STATS;
     }
+  },
+  
+  // Helper function to get unique product names from the stats
+  getUniqueProductNames(stats: AgriStatistic[]): string[] {
+    if (!stats || !stats.length) return [];
+    return Array.from(new Set(stats.map(item => item.name))).sort();
+  },
+  
+  // Helper to filter stats by product name
+  filterStatsByProduct(stats: AgriStatistic[], productName: string | null): AgriStatistic[] {
+    if (!productName) return stats;
+    return stats.filter(item => item.name === productName);
   }
 };
