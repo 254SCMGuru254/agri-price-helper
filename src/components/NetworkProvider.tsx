@@ -34,12 +34,24 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     };
 
+    // Listen for service worker messages
+    const handleServiceWorkerMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'SYNC_OFFLINE_DATA') {
+        toast({
+          title: "Syncing data",
+          description: `Syncing ${event.data.payload.count} offline submissions`,
+        });
+      }
+    };
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    navigator.serviceWorker?.addEventListener('message', handleServiceWorkerMessage);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      navigator.serviceWorker?.removeEventListener('message', handleServiceWorkerMessage);
     };
   }, []);
 

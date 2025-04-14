@@ -6,6 +6,9 @@ const urlsToCache = [
   '/src/main.tsx',
   '/src/App.tsx',
   '/src/index.css',
+  '/manifest.json',
+  '/logo192.png',
+  '/logo512.png',
 ];
 
 // Install service worker
@@ -28,7 +31,11 @@ self.addEventListener('fetch', (event) => {
         if (response) {
           return response;
         }
-        return fetch(event.request)
+        
+        // Clone the request
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest)
           .then((response) => {
             // Check if we received a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
@@ -40,7 +47,10 @@ self.addEventListener('fetch', (event) => {
 
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                // Don't cache API requests with query parameters
+                if (!event.request.url.includes('?')) {
+                  cache.put(event.request, responseToCache);
+                }
               });
 
             return response;
@@ -50,6 +60,9 @@ self.addEventListener('fetch', (event) => {
             if (event.request.mode === 'navigate') {
               return caches.match('/');
             }
+            
+            // For images and other resources
+            return caches.match('/placeholder.svg');
           });
       })
   );
@@ -70,3 +83,38 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+
+// Handle offline synchronization
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-market-prices') {
+    event.waitUntil(syncMarketPrices());
+  }
+});
+
+// Function to sync market prices when back online
+async function syncMarketPrices() {
+  try {
+    const offlinePricesStr = localStorage.getItem('offline_prices');
+    if (!offlinePricesStr) return;
+    
+    const offlinePrices = JSON.parse(offlinePricesStr);
+    if (offlinePrices.length === 0) return;
+    
+    // This is just a placeholder - actual sync would need
+    // to be handled in the main app code, as the service worker
+    // doesn't have direct access to Supabase client
+    console.log('Service worker attempting to sync', offlinePrices.length, 'offline submissions');
+    
+    // Notify the main thread to attempt sync
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_OFFLINE_DATA',
+          payload: { count: offlinePrices.length }
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error syncing offline data:', error);
+  }
+}
