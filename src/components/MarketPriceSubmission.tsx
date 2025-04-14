@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ export const MarketPriceSubmission = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [formData, setFormData] = useState({
     commodity: "",
     price: "",
@@ -27,26 +27,52 @@ export const MarketPriceSubmission = () => {
   });
 
   useEffect(() => {
+    const handleOnlineStatus = () => {
+      setIsOffline(!navigator.onLine);
+    };
+
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener('online', handleOnlineStatus);
+      window.removeEventListener('offline', handleOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchCategories = async () => {
-      const { data, error } = await supabase
-        .from("commodity_categories")
-        .select("*")
-        .order("name");
-      
-      if (error) {
-        console.error("Error fetching categories:", error);
-        return;
+      const cachedCategories = localStorage.getItem('commodity_categories');
+      if (cachedCategories) {
+        setCategories(JSON.parse(cachedCategories));
       }
-      
-      setCategories(data);
+
+      if (navigator.onLine) {
+        try {
+          const { data, error } = await supabase
+            .from("commodity_categories")
+            .select("*")
+            .order("name");
+          
+          if (error) {
+            console.error("Error fetching categories:", error);
+            return;
+          }
+          
+          localStorage.setItem('commodity_categories', JSON.stringify(data));
+          setCategories(data);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      }
     };
 
     fetchCategories();
-  }, []);
+  }, [isOffline]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    if (!user && !isOffline) {
       toast({
         title: "Authentication required",
         description: "Please sign in to submit market prices",
@@ -57,22 +83,39 @@ export const MarketPriceSubmission = () => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("market_prices").insert({
+      const priceData = {
         commodity: formData.commodity,
         price: parseFloat(formData.price),
         unit: formData.unit,
         location: formData.location,
         is_organic: formData.is_organic,
-        submitted_by: user.id,
+        submitted_by: user?.id || 'offline-user',
         category_id: formData.category_id || null,
-      });
+      };
 
-      if (error) throw error;
+      if (isOffline) {
+        const offlinePrices = JSON.parse(localStorage.getItem('offline_prices') || '[]');
+        offlinePrices.push({
+          ...priceData,
+          created_at: new Date().toISOString(),
+          pending: true
+        });
+        localStorage.setItem('offline_prices', JSON.stringify(offlinePrices));
+        
+        toast({
+          title: "Saved offline",
+          description: "Your price has been saved locally and will be submitted when you're back online",
+        });
+      } else {
+        const { error } = await supabase.from("market_prices").insert(priceData);
 
-      toast({
-        title: "Success!",
-        description: "Market price submitted successfully",
-      });
+        if (error) throw error;
+
+        toast({
+          title: "Success!",
+          description: "Market price submitted successfully",
+        });
+      }
 
       setFormData({
         commodity: "",
@@ -94,8 +137,56 @@ export const MarketPriceSubmission = () => {
     }
   };
 
+  const syncOfflineData = async () => {
+    if (!navigator.onLine || !user) return;
+    
+    const offlinePrices = JSON.parse(localStorage.getItem('offline_prices') || '[]');
+    if (offlinePrices.length === 0) return;
+    
+    let successCount = 0;
+    const failedSubmissions = [];
+    
+    for (const price of offlinePrices) {
+      price.submitted_by = user.id;
+      
+      try {
+        const { error } = await supabase.from("market_prices").insert(price);
+        if (error) {
+          failedSubmissions.push(price);
+        } else {
+          successCount++;
+        }
+      } catch (error) {
+        failedSubmissions.push(price);
+      }
+    }
+    
+    localStorage.setItem('offline_prices', JSON.stringify(failedSubmissions));
+    
+    if (successCount > 0) {
+      toast({
+        title: "Offline Data Synced",
+        description: `Successfully submitted ${successCount} saved prices`,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!isOffline && user) {
+      syncOfflineData();
+    }
+  }, [isOffline, user]);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
+      {isOffline && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+          <p className="text-yellow-700">
+            You're currently offline. Your submissions will be saved locally and submitted when you're back online.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="category">Category</Label>
         <Select

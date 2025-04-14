@@ -1,94 +1,64 @@
-
+import { Link } from "react-router-dom";
+import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, Globe } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./AuthProvider";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "./LanguageContext";
+import { Carrot, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NetworkStatus } from "./NetworkStatus";
 
 export const Navbar = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { language, setLanguage, t } = useLanguage();
-
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate("/auth");
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+  const { user, signOut } = useAuth();
 
   return (
-    <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md z-50 border-b">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <a href="/" className="text-xl font-bold text-primary">
-              AgriInsights
-            </a>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-foreground/80 hover:text-primary transition-colors">
-              {t('nav.features')}
-            </a>
-            <a href="#how-it-works" className="text-foreground/80 hover:text-primary transition-colors">
-              {t('nav.howItWorks')}
-            </a>
-
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <Link to="/" className="mr-6 flex items-center space-x-2">
+          <Carrot className="h-6 w-6" />
+          <span className="hidden font-bold sm:inline-block">
+            AgriPrice Helper
+          </span>
+        </Link>
+        
+        <div className="ml-auto flex items-center space-x-4">
+          <NetworkStatus />
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Globe className="h-4 w-4" />
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                    <AvatarFallback>{user.user_metadata?.full_name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLanguage('en')}>
-                  🇬🇧 English {language === 'en' && '✓'}
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('sw')}>
-                  🇰🇪 Kiswahili {language === 'sw' && '✓'}
+                <DropdownMenuItem>
+                  Settings
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {user ? (
-              <Button variant="outline" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                {t('nav.signOut')}
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" onClick={() => navigate("/auth")}>
-                  {t('nav.signIn')}
-                </Button>
-                <Button onClick={() => navigate("/auth")}>
-                  {t('nav.getStarted')}
-                </Button>
-              </>
-            )}
-          </div>
-          
-          <button className="md:hidden p-2">
-            <Menu className="h-6 w-6" />
-          </button>
+          ) : (
+            <Link to="/auth">
+              <Button>Sign In</Button>
+            </Link>
+          )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
