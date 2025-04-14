@@ -220,14 +220,14 @@ export const AgriTimeSeriesChart = () => {
           <div className="flex items-center space-x-2">
             <Filter className="h-4 w-4" />
             <Select 
-              value={productFilter || ''} 
-              onValueChange={(value) => setProductFilter(value || null)}
+              value={productFilter || "all-products"} 
+              onValueChange={(value) => setProductFilter(value === "all-products" ? null : value)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Product" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Products</SelectItem>
+                <SelectItem value="all-products">All Products</SelectItem>
                 {productNames.map(name => (
                   <SelectItem key={name} value={name}>{name}</SelectItem>
                 ))}
@@ -239,14 +239,14 @@ export const AgriTimeSeriesChart = () => {
           <div className="flex items-center space-x-2">
             <Filter className="h-4 w-4" />
             <Select 
-              value={yearFilter?.toString() || ''} 
-              onValueChange={(value) => setYearFilter(value ? Number(value) : null)}
+              value={yearFilter?.toString() || "all-years"} 
+              onValueChange={(value) => setYearFilter(value === "all-years" ? null : Number(value))}
             >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Years</SelectItem>
+                <SelectItem value="all-years">All Years</SelectItem>
                 {availableYears.map(year => (
                   <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                 ))}
