@@ -381,6 +381,39 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          id: string
+          image_url: string | null
+          is_read: boolean | null
+          room_id: string | null
+          text: string | null
+          timestamp: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          id?: string
+          image_url?: string | null
+          is_read?: boolean | null
+          room_id?: string | null
+          text?: string | null
+          timestamp?: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          id?: string
+          image_url?: string | null
+          is_read?: boolean | null
+          room_id?: string | null
+          text?: string | null
+          timestamp?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       price_votes: {
         Row: {
           created_at: string
