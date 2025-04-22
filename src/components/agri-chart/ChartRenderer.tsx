@@ -10,7 +10,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  ResponsiveContainer
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { AgriStatistic } from "@/services/KenyaAgriStatsService";
@@ -60,7 +61,7 @@ export const ChartRenderer = ({
     />,
     yAxis: <YAxis 
       label={{ 
-        value: 'Value', 
+        value: productFilter ? `${productFilter} (units)` : 'Value', 
         angle: -90, 
         position: 'insideLeft',
         offset: 10
@@ -72,6 +73,13 @@ export const ChartRenderer = ({
       labelFormatter={formatLabel}
     />,
     legend: <Legend />
+  };
+
+  const getChartTitle = () => {
+    if (productFilter) {
+      return `${productFilter} (2019-2024)`;
+    }
+    return t('stats.agriculturalData') || 'Agricultural Data';
   };
 
   switch (chartType) {
@@ -87,7 +95,7 @@ export const ChartRenderer = ({
             <Line
               type="monotone"
               dataKey="value"
-              name={productFilter || (t('stats.agriculturalData') || 'Agricultural Data')}
+              name={getChartTitle()}
               stroke="var(--color-value)"
               strokeWidth={2}
               activeDot={{ r: 8 }}
@@ -106,7 +114,7 @@ export const ChartRenderer = ({
             {axisProps.legend}
             <Bar
               dataKey="value"
-              name={productFilter || (t('stats.agriculturalData') || 'Agricultural Data')}
+              name={getChartTitle()}
               fill="var(--color-value)"
               radius={[4, 4, 0, 0]}
             />
@@ -125,7 +133,7 @@ export const ChartRenderer = ({
             <Area
               type="monotone"
               dataKey="value"
-              name={productFilter || (t('stats.agriculturalData') || 'Agricultural Data')}
+              name={getChartTitle()}
               stroke="var(--color-value)"
               fill="var(--color-value)"
               fillOpacity={0.3}

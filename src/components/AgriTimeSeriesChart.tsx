@@ -43,6 +43,31 @@ export const AgriTimeSeriesChart = () => {
     );
   }
 
+  // No data after filtering
+  if (processedData.length === 0) {
+    return (
+      <Card className="p-6">
+        <ChartControls 
+          chartType={chartType}
+          setChartType={setChartType}
+          yearFilter={yearFilter}
+          setYearFilter={setYearFilter}
+          productFilter={productFilter}
+          setProductFilter={setProductFilter}
+          availableYears={availableYears}
+          productNames={productNames}
+          handleResetFilters={handleResetFilters}
+        />
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center text-muted-foreground">
+            {t('stats.noDataAvailable') || 'No data available for the selected filters'}
+          </div>
+        </div>
+        <ChartFooter />
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <ChartControls 

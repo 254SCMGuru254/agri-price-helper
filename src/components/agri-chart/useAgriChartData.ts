@@ -16,10 +16,10 @@ export function useAgriChartData() {
     retry: 3, // Retry 3 times on failure
   });
 
-  // Get unique product names for the filter
+  // Get unique product names for the filter - sorted alphabetically for better UX
   const productNames = useMemo(() => {
     if (!stats) return [];
-    return KenyaAgriStatsService.getUniqueProductNames(stats);
+    return KenyaAgriStatsService.getUniqueProductNames(stats).sort();
   }, [stats]);
 
   // Process data for better visualization
