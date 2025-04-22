@@ -9,6 +9,9 @@ import { SuccessStories } from "@/components/SuccessStories";
 import { UserPoints } from "@/components/UserPoints";
 import { WeatherUpdates } from "@/components/WeatherUpdates";
 import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
+import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
+import { MessagingContainer } from "@/components/messaging/MessagingContainer";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   return (
@@ -20,6 +23,21 @@ const Index = () => {
         <div className="py-8">
           <AgriTimeSeriesChart />
         </div>
+        
+        <div className="py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Submit Market Prices</h2>
+              <MarketPriceSubmission />
+            </Card>
+            
+            <Card className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Farmer Messaging</h2>
+              <MessagingContainer />
+            </Card>
+          </div>
+        </div>
+        
         <div className="py-8 space-y-16">
           <WeatherUpdates />
           <ExpertQA />
