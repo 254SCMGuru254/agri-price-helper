@@ -21,14 +21,20 @@ export const useMessages = () => {
     const fetchMessages = async () => {
       try {
         setIsLoading(true);
-        const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .order('timestamp', { ascending: true });
-
-        if (error) throw error;
-
-        setMessages(data as MessageType[] || []);
+        // Mock data for now since we don't have a messages table yet
+        // In a real app, you would create a messages table in Supabase first
+        const mockMessages: MessageType[] = [
+          {
+            id: '1',
+            user_id: user.id,
+            user_name: 'Agricultural Expert',
+            text: 'Welcome to the farmer messaging system! How can I help you today?',
+            image_url: null,
+            timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+          },
+        ];
+        
+        setMessages(mockMessages);
       } catch (err) {
         console.error('Error fetching messages:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch messages'));
@@ -39,20 +45,12 @@ export const useMessages = () => {
 
     fetchMessages();
 
-    // Subscribe to new messages
-    const messagesSubscription = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'messages' 
-      }, (payload) => {
-        setMessages(prev => [...prev, payload.new as MessageType]);
-      })
-      .subscribe();
+    // In a real app, you would set up a subscription to the messages table
+    // For now, we'll just mock this behavior
+    const mockSubscription = { unsubscribe: () => {} };
 
     return () => {
-      supabase.removeChannel(messagesSubscription);
+      mockSubscription.unsubscribe();
     };
   }, [user]);
 
@@ -84,38 +82,29 @@ export const useMessages = () => {
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${user.id}/${timestamp}.${fileExt}`;
         
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('message_images')
-          .upload(fileName, imageFile);
-
-        if (uploadError) throw uploadError;
-
-        // Get the public URL
-        const { data: urlData } = supabase.storage
-          .from('message_images')
-          .getPublicUrl(fileName);
-
-        image_url = urlData.publicUrl;
+        // In a real app, you would create a storage bucket first
+        // For now, we'll just simulate the upload
+        console.log(`Simulating upload of ${fileName}`);
+        
+        // Simulate a delay for the upload
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        image_url = 'https://example.com/sample-image.jpg';
       }
 
-      // Save message to database
-      const { data, error } = await supabase
-        .from('messages')
-        .insert({
-          user_id: user.id,
-          user_name: user.user_metadata?.full_name || 'Anonymous',
-          text: text.trim() || null,
-          image_url,
-          timestamp: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      // In a real app, you would save to Supabase database
+      // For now, we'll just simulate this
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const data: MessageType = {
+        ...tempMessage,
+        image_url,
+        id: uuidv4() // In a real app, this would come from the database
+      };
 
       // Replace the temp message with the real one
       setMessages(prev => 
-        prev.map(msg => msg.id === tempId ? (data as MessageType) : msg)
+        prev.map(msg => msg.id === tempId ? data : msg)
       );
 
     } catch (err) {
