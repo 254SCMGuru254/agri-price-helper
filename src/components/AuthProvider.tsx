@@ -41,11 +41,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => subscription.unsubscribe();
       } catch (error) {
         console.error("Auth initialization error:", error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "There was a problem initializing authentication",
-        });
+        if (toast) {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "There was a problem initializing authentication",
+          });
+        }
         setIsLoading(false);
       }
     };
@@ -57,17 +59,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out",
-      });
+      if (toast) {
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out",
+        });
+      }
     } catch (error: any) {
       console.error("Sign out error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "There was a problem signing out",
-      });
+      if (toast) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "There was a problem signing out",
+        });
+      }
     }
   };
 
