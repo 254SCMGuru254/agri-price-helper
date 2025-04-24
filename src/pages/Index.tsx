@@ -3,9 +3,6 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
-import { ExpertQA } from "@/components/ExpertQA";
-import { CommunityForum } from "@/components/CommunityForum";
-import { SuccessStories } from "@/components/SuccessStories";
 import { UserPoints } from "@/components/UserPoints";
 import { WeatherUpdates } from "@/components/WeatherUpdates";
 import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
@@ -17,15 +14,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4">
+      <main>
         <Hero />
-        <UserPoints />
-        <div className="py-8">
-          <AgriTimeSeriesChart />
-        </div>
         
-        <div className="py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="container mx-auto px-4 py-8">
+          <UserPoints />
+          
+          <div className="my-12">
+            <AgriTimeSeriesChart />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-4">Submit Market Prices</h2>
               <MarketPriceSubmission />
@@ -36,18 +35,17 @@ const Index = () => {
               <MessagingContainer />
             </Card>
           </div>
+          
+          <div className="my-12">
+            <WeatherUpdates />
+          </div>
         </div>
         
-        <div className="py-8 space-y-16">
-          <WeatherUpdates />
-          <ExpertQA />
-          <CommunityForum />
-          <SuccessStories />
-        </div>
-        <div id="features">
+        <div id="features" className="py-8">
           <Features />
         </div>
-        <div id="how-it-works">
+        
+        <div id="how-it-works" className="py-8">
           <HowItWorks />
         </div>
       </main>

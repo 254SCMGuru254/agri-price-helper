@@ -1,4 +1,5 @@
-import { ArrowRight, BookOpen, MessageSquare, Users, Award } from "lucide-react";
+
+import { ArrowRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -9,7 +10,7 @@ export const Hero = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const handleAuthenticatedAction = (action: string, sectionId?: string) => {
+  const handleAuthenticatedAction = () => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -19,11 +20,11 @@ export const Hero = () => {
       return;
     }
 
-    if (sectionId) {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      navigate("/dashboard");
-    }
+    navigate("/dashboard");
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -36,57 +37,10 @@ export const Hero = () => {
           Join our community to share and access up-to-date agricultural market prices and expert farming advice
         </p>
         
-        <div className="grid md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
-          <div className="space-y-4">
-            <MessageSquare className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Expert Q&A</h3>
-            <p className="text-muted-foreground">
-              Connect with agricultural experts and get answers to your farming questions. Share knowledge and grow together.
-            </p>
-            <Button 
-              variant="outline"
-              onClick={() => handleAuthenticatedAction('Ask Experts', 'expert-qa')}
-            >
-              Ask Experts
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <Users className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Community Forum</h3>
-            <p className="text-muted-foreground">
-              Join discussions with fellow farmers, share experiences, and learn from the community's collective wisdom.
-            </p>
-            <Button 
-              variant="outline"
-              onClick={() => handleAuthenticatedAction('Join Discussion', 'community-forum')}
-            >
-              Join Discussion
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <Award className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Success Stories</h3>
-            <p className="text-muted-foreground">
-              Read inspiring stories from farmers who've achieved remarkable results. Share your own success story!
-            </p>
-            <Button 
-              variant="outline"
-              onClick={() => handleAuthenticatedAction('Share Success', 'success-stories')}
-            >
-              Share Success
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
             size="lg" 
-            onClick={() => user ? navigate('/dashboard') : navigate('/auth')}
+            onClick={handleAuthenticatedAction}
             className="bg-accent hover:bg-accent/90"
           >
             {user ? 'Go to Dashboard' : 'Get Started'}
@@ -95,7 +49,7 @@ export const Hero = () => {
           <Button 
             size="lg" 
             variant="outline"
-            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => scrollToSection('how-it-works')}
           >
             Learn More
             <BookOpen className="ml-2 h-5 w-5" />

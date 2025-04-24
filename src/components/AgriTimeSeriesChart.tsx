@@ -26,6 +26,7 @@ export const AgriTimeSeriesChart = () => {
   if (isLoading) {
     return (
       <Card className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Agricultural Statistics</h2>
         <div className="flex items-center justify-center h-[400px]">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -36,6 +37,7 @@ export const AgriTimeSeriesChart = () => {
   if (error) {
     return (
       <Card className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Agricultural Statistics</h2>
         <div className="text-center text-red-500">
           {t('errors.failedToLoadStats') || 'Failed to load agricultural statistics'}
         </div>
@@ -47,6 +49,7 @@ export const AgriTimeSeriesChart = () => {
   if (processedData.length === 0) {
     return (
       <Card className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Agricultural Statistics</h2>
         <ChartControls 
           chartType={chartType}
           setChartType={setChartType}
@@ -70,6 +73,7 @@ export const AgriTimeSeriesChart = () => {
 
   return (
     <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Agricultural Statistics</h2>
       <ChartControls 
         chartType={chartType}
         setChartType={setChartType}

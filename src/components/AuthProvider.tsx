@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +21,6 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -41,39 +40,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => subscription.unsubscribe();
       } catch (error) {
         console.error("Auth initialization error:", error);
-        if (toast) {
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "There was a problem initializing authentication",
-          });
-        }
         setIsLoading(false);
       }
     };
 
     initializeAuth();
-  }, [toast]);
+  }, []);
 
   // Add signOut function
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      if (toast) {
-        toast({
-          title: "Signed out",
-          description: "You have been successfully signed out",
-        });
-      }
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out",
+      });
     } catch (error: any) {
       console.error("Sign out error:", error);
-      if (toast) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "There was a problem signing out",
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "There was a problem signing out",
+      });
     }
   };
 
