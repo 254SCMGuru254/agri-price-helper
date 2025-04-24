@@ -1,3 +1,4 @@
+
 export interface AgriStatistic {
   id: number;
   name: string;
@@ -77,7 +78,8 @@ export const KenyaAgriStatsService = {
           return REAL_KENYA_STATS;
         }
         
-        return sanitizeData(data);
+        // We removed the sanitizeData call and just return the data
+        return data;
       } catch (parseError) {
         console.error('Error parsing API response:', parseError);
         return REAL_KENYA_STATS;
