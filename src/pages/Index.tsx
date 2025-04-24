@@ -9,6 +9,7 @@ import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
 import { MessagingContainer } from "@/components/messaging/MessagingContainer";
 import { Card } from "@/components/ui/card";
+import { SuccessStories } from "@/components/SuccessStories";
 
 const Index = () => {
   return (
@@ -39,13 +40,17 @@ const Index = () => {
           <div className="my-12">
             <WeatherUpdates />
           </div>
+          
+          <div className="my-12">
+            <SuccessStories />
+          </div>
         </div>
         
-        <div id="features" className="py-8">
+        <div id="features" className="py-12 bg-muted/30">
           <Features />
         </div>
         
-        <div id="how-it-works" className="py-8">
+        <div id="how-it-works" className="py-12">
           <HowItWorks />
         </div>
       </main>
