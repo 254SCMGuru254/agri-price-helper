@@ -3,7 +3,7 @@ import { useAgriChartData } from "./useAgriChartData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ChartIcon, Users } from "lucide-react";
+import { ChartBarIcon, ChartPieIcon, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const AgriAnalyticsDashboard = () => {
@@ -19,11 +19,11 @@ export const AgriAnalyticsDashboard = () => {
 
   if (isLoading) {
     return (
-      <Card className="p-4 md:p-6 mb-12">
+      <Card className="p-4 md:p-6 mb-8">
         <CardHeader className="pb-2">
           <CardTitle>Agricultural Analytics</CardTitle>
         </CardHeader>
-        <CardContent className="h-[300px] flex items-center justify-center">
+        <CardContent className="h-[200px] flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </CardContent>
       </Card>
@@ -32,7 +32,7 @@ export const AgriAnalyticsDashboard = () => {
 
   if (error) {
     return (
-      <Card className="p-4 md:p-6 mb-12">
+      <Card className="p-4 md:p-6 mb-8">
         <CardHeader className="pb-2">
           <CardTitle>Agricultural Analytics</CardTitle>
         </CardHeader>
@@ -44,21 +44,26 @@ export const AgriAnalyticsDashboard = () => {
   }
 
   return (
-    <Card className="p-4 md:p-6 mb-12">
+    <Card className="p-4 md:p-6 mb-8">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-          <ChartIcon className="h-5 w-5" />
-          Agricultural Analytics
+          <ChartBarIcon className="h-5 w-5" />
+          Agricultural Insights Dashboard
         </CardTitle>
+        <p className="text-muted-foreground text-sm">Key metrics to support farming decisions, market analysis, and policy making</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader className="py-3">
-                <CardTitle className="text-base md:text-lg">Production Distribution</CardTitle>
+                <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                  <ChartPieIcon className="h-4 w-4" />
+                  Crop Production Distribution
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">Market share by crop type</p>
               </CardHeader>
-              <CardContent className={`${isMobile ? 'h-[250px]' : 'h-[300px]'}`}>
+              <CardContent className={`${isMobile ? 'h-[220px]' : 'h-[260px]'}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -67,56 +72,64 @@ export const AgriAnalyticsDashboard = () => {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      outerRadius={isMobile ? 70 : 90}
+                      outerRadius={isMobile ? 60 : 80}
                       fill="#22c55e"
                       label={({ name, percent }) => 
                         `${name.split(' ')[0]}: ${(percent * 100).toFixed(0)}%`
                       }
                     />
-                    <Tooltip formatter={(value) => value.toLocaleString()} />
-                    <Legend layout={isMobile ? "horizontal" : "vertical"} verticalAlign="bottom" align="center" />
+                    <Tooltip 
+                      formatter={(value) => [`${value.toLocaleString()} tons`, 'Production']}
+                      labelFormatter={(name) => `Crop: ${name}`}
+                    />
+                    <Legend layout={isMobile ? "horizontal" : "vertical"} verticalAlign="bottom" align={isMobile ? "center" : "right"} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-sm">
               <CardHeader className="py-3">
-                <CardTitle className="text-base md:text-lg">Annual Trends (2019-2024)</CardTitle>
+                <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                  <ChartBarIcon className="h-4 w-4" />
+                  Annual Production Trends
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">Yearly output for informed decision making</p>
               </CardHeader>
-              <CardContent className={`${isMobile ? 'h-[250px]' : 'h-[300px]'}`}>
+              <CardContent className={`${isMobile ? 'h-[220px]' : 'h-[260px]'}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={processedData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
                     <Tooltip 
-                      formatter={(value) => value.toLocaleString()}
+                      formatter={(value) => [`${value.toLocaleString()} tons`, 'Production']}
                       labelFormatter={(label) => `Year: ${label}`}
                     />
                     <Legend />
-                    <Bar dataKey="value" name="Production" fill="#22c55e" />
+                    <Bar dataKey="value" name="Total Production" fill="#22c55e" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="py-3">
               <CardTitle className="text-base md:text-lg flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Production Comparison
+                Crop Production Comparison
               </CardTitle>
+              <p className="text-xs text-muted-foreground">Compare crop performance over time for optimal planting decisions</p>
             </CardHeader>
-            <CardContent className="h-[300px] md:h-[350px]">
+            <CardContent className="h-[260px] md:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={yearlyGrowth}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value) => value.toLocaleString()}
+                    formatter={(value) => [`${value.toLocaleString()} tons`, 'Production']}
                     labelFormatter={(label) => `Year: ${label}`}
                   />
                   <Legend />
@@ -130,8 +143,8 @@ export const AgriAnalyticsDashboard = () => {
                         dataKey={key}
                         stroke={`hsl(${index * 45 + 100}, 70%, 50%)`}
                         strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
                       />
                     ))}
                 </LineChart>
