@@ -1,39 +1,17 @@
-
 export interface AgriStatistic {
   id: number;
   name: string;
   value: number;
   year: number;
-  month?: number;
   category?: string;
 }
 
-// Use HTTPS for secure connection
-const BASE_URL = 'https://statistics.kilimo.go.ke/en/api';
+interface CropTrend {
+  year: number;
+  [key: string]: number;
+}
 
-// Helper function to sanitize incoming data
-const sanitizeData = (data: any): AgriStatistic[] => {
-  // Check if data is an array, if not, return empty array
-  if (!Array.isArray(data)) {
-    console.error('Expected array data but received:', typeof data);
-    return [];
-  }
-  
-  return data
-    .filter(item => 
-      typeof item.id === 'number' && 
-      typeof item.value === 'number' && 
-      typeof item.year === 'number'
-    )
-    .map(item => ({
-      id: Number(item.id),
-      name: String(item.name || 'Unknown'),
-      value: Number(item.value),
-      year: Number(item.year),
-      month: item.month ? Number(item.month) : undefined,
-      category: item.category ? String(item.category) : undefined
-    }));
-};
+const BASE_URL = 'https://statistics.kilimo.go.ke/en/api';
 
 // Real agricultural statistics data for Kenya (2019-2024)
 const REAL_KENYA_STATS = [
@@ -72,7 +50,6 @@ const REAL_KENYA_STATS = [
 export const KenyaAgriStatsService = {
   async fetchStats(): Promise<AgriStatistic[]> {
     try {
-      // Use AbortController for timeout handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
@@ -95,7 +72,6 @@ export const KenyaAgriStatsService = {
       try {
         const data = await response.json();
         
-        // Check if the API returned valid data we can use
         if (!Array.isArray(data) || !data.length || !data[0]?.value) {
           console.warn('API did not return usable data. Using real data instead.');
           return REAL_KENYA_STATS;
@@ -109,20 +85,43 @@ export const KenyaAgriStatsService = {
     } catch (error) {
       console.error('Error fetching agricultural statistics:', error);
       
-      // Return real data in case of error
       return REAL_KENYA_STATS;
     }
   },
-  
-  // Helper function to get unique product names from the stats
+
   getUniqueProductNames(stats: AgriStatistic[]): string[] {
     if (!stats || !stats.length) return [];
     return Array.from(new Set(stats.map(item => item.name))).sort();
   },
-  
-  // Helper to filter stats by product name
+
   filterStatsByProduct(stats: AgriStatistic[], productName: string | null): AgriStatistic[] {
     if (!productName) return stats;
     return stats.filter(item => item.name === productName);
+  },
+
+  calculateProductionShare(stats: AgriStatistic[]): { name: string; value: number; }[] {
+    const latestYear = Math.max(...stats.map(s => s.year));
+    const latestStats = stats.filter(s => s.year === latestYear);
+    
+    return latestStats.map(stat => ({
+      name: stat.name,
+      value: stat.value
+    }));
+  },
+
+  calculateYearlyGrowth(stats: AgriStatistic[]): CropTrend[] {
+    const products = this.getUniqueProductNames(stats);
+    const years = Array.from(new Set(stats.map(s => s.year))).sort();
+    
+    return years.map(year => {
+      const yearData: CropTrend = { year };
+      products.forEach(product => {
+        const stat = stats.find(s => s.year === year && s.name === product);
+        if (stat) {
+          yearData[product] = stat.value;
+        }
+      });
+      return yearData;
+    });
   }
 };

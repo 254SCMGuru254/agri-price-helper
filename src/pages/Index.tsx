@@ -5,10 +5,10 @@ import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { UserPoints } from "@/components/UserPoints";
 import { WeatherUpdates } from "@/components/WeatherUpdates";
-import { AgriTimeSeriesChart } from "@/components/AgriTimeSeriesChart";
+import { AgriAnalyticsDashboard } from "@/components/agri-chart/AgriAnalyticsDashboard";
+import { Card } from "@/components/ui/card";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
 import { MessagingContainer } from "@/components/messaging/MessagingContainer";
-import { Card } from "@/components/ui/card";
 import { SuccessStories } from "@/components/SuccessStories";
 
 const Index = () => {
@@ -18,14 +18,11 @@ const Index = () => {
       <main>
         <Hero />
         
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 space-y-12">
           <UserPoints />
+          <AgriAnalyticsDashboard />
           
-          <div className="my-12">
-            <AgriTimeSeriesChart />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-4">Submit Market Prices</h2>
               <MarketPriceSubmission />
@@ -37,13 +34,8 @@ const Index = () => {
             </Card>
           </div>
           
-          <div className="my-12">
-            <WeatherUpdates />
-          </div>
-          
-          <div className="my-12">
-            <SuccessStories />
-          </div>
+          <WeatherUpdates />
+          <SuccessStories />
         </div>
         
         <div id="features" className="py-12 bg-muted/30">

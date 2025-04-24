@@ -1,71 +1,36 @@
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { KenyaAgriStatsService } from "@/services/KenyaAgriStatsService";
 
 export function useAgriChartData() {
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
-  const [yearFilter, setYearFilter] = useState<number | null>(null);
-  const [productFilter, setProductFilter] = useState<string | null>(null);
-  
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['agriStats'],
     queryFn: KenyaAgriStatsService.fetchStats,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
-    retry: 3, // Retry 3 times on failure
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
-  // Get unique product names for the filter - sorted alphabetically for better UX
-  const productNames = useMemo(() => {
-    if (!stats) return [];
-    return KenyaAgriStatsService.getUniqueProductNames(stats).sort();
-  }, [stats]);
-
-  // Process data for better visualization
   const processedData = useMemo(() => {
     if (!stats) return [];
-    
-    // First apply product filter if set
-    let filteredStats = stats;
-    if (productFilter) {
-      filteredStats = KenyaAgriStatsService.filterStatsByProduct(filteredStats, productFilter);
-    }
-    
-    // Then apply year filter if set
-    if (yearFilter) {
-      filteredStats = filteredStats.filter(item => item.year === yearFilter);
-    }
-    
-    // Sort by year for better timeline view
-    return [...filteredStats].sort((a, b) => a.year - b.year);
-  }, [stats, yearFilter, productFilter]);
-
-  // Get unique years for filter
-  const availableYears = useMemo(() => {
-    if (!stats) return [];
-    const years = Array.from(new Set(stats.map(item => item.year))).sort();
-    return years;
+    return [...stats].sort((a, b) => a.year - b.year);
   }, [stats]);
 
-  const handleResetFilters = () => {
-    setYearFilter(null);
-    setProductFilter(null);
-  };
+  const productionShare = useMemo(() => {
+    if (!stats) return [];
+    return KenyaAgriStatsService.calculateProductionShare(stats);
+  }, [stats]);
+
+  const yearlyGrowth = useMemo(() => {
+    if (!stats) return [];
+    return KenyaAgriStatsService.calculateYearlyGrowth(stats);
+  }, [stats]);
 
   return {
-    chartType,
-    setChartType,
-    yearFilter,
-    setYearFilter,
-    productFilter,
-    setProductFilter,
-    productNames,
     processedData,
-    availableYears,
-    stats,
+    productionShare,
+    yearlyGrowth,
     isLoading,
     error,
-    handleResetFilters
   };
 }
