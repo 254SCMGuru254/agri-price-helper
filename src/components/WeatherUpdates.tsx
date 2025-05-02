@@ -42,7 +42,7 @@ export const WeatherUpdates = () => {
       toast({
         title: "Location services unavailable",
         description: "Using default location (Nairobi, Kenya) for weather data",
-        variant: "warning"
+        variant: "default" // Changed from "warning" to "default"
       });
     };
 
