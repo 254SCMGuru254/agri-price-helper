@@ -3,48 +3,81 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { WeatherCard } from "./weather/WeatherCard";
+import { AlertTriangle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import type { Location, WeatherData } from "./weather/types";
 
 const fetchWeatherData = async (location: Location): Promise<WeatherData> => {
-  const response = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`
-  );
-  
-  if (!response.ok) {
-    throw new Error("Failed to fetch weather data");
+  try {
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`,
+      { mode: 'cors' }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch weather data: ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error) {
+    console.error("Weather API fetch error:", error);
+    throw error;
   }
-  
-  return response.json();
 };
 
 export const WeatherUpdates = () => {
   const [location, setLocation] = useState<Location | null>(null);
+  const { toast } = useToast();
+
+  // Default location for Nairobi, Kenya
+  const defaultLocation: Location = {
+    lat: -1.286389,
+    lon: 36.817223
+  };
 
   useEffect(() => {
+    const setDefaultLocation = () => {
+      console.log("Using default location (Nairobi, Kenya)");
+      setLocation(defaultLocation);
+      toast({
+        title: "Location services unavailable",
+        description: "Using default location (Nairobi, Kenya) for weather data",
+        variant: "warning"
+      });
+    };
+
     if ("geolocation" in navigator) {
+      // Set a timeout in case geolocation takes too long
+      const timeoutId = setTimeout(() => {
+        if (!location) {
+          setDefaultLocation();
+        }
+      }, 5000);
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          clearTimeout(timeoutId);
           setLocation({
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           });
         },
         (error) => {
+          clearTimeout(timeoutId);
           console.error("Error getting location:", error);
-          // Fallback to a default location (e.g., Nairobi, Kenya)
-          setLocation({
-            lat: -1.286389,
-            lon: 36.817223,
-          });
+          setDefaultLocation();
+        },
+        { 
+          enableHighAccuracy: false, 
+          timeout: 5000,
+          maximumAge: 60000
         }
       );
     } else {
-      // Fallback to a default location if geolocation is not available
-      setLocation({
-        lat: -1.286389,
-        lon: 36.817223,
-      });
+      setDefaultLocation();
     }
+
+    return () => {}; // Cleanup function
   }, []);
 
   const { data: weather, isLoading, error } = useQuery({
@@ -56,6 +89,7 @@ export const WeatherUpdates = () => {
     enabled: !!location,
     retry: 2,
     staleTime: 300000, // 5 minutes
+    refetchOnWindowFocus: false
   });
 
   if (!location) {
@@ -63,9 +97,10 @@ export const WeatherUpdates = () => {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold mb-4">Weather Updates</h2>
         <Card className="p-6">
-          <p className="text-muted-foreground">
-            Please enable location services to see weather updates.
-          </p>
+          <div className="flex items-center gap-2 text-yellow-600">
+            <AlertTriangle size={18} />
+            <p>Awaiting location data...</p>
+          </div>
         </Card>
       </div>
     );
@@ -76,9 +111,10 @@ export const WeatherUpdates = () => {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold mb-4">Weather Updates</h2>
         <Card className="p-6">
-          <p className="text-red-500">
-            Failed to load weather data. Please try again later.
-          </p>
+          <div className="flex items-center gap-2 text-red-500">
+            <AlertTriangle size={18} />
+            <p>Failed to load weather data. Please try again later.</p>
+          </div>
         </Card>
       </div>
     );

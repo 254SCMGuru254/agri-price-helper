@@ -10,12 +10,16 @@
     <meta property="og:image" content="/og-image.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#4f46e5" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/logo192.png" />
     
-    <!-- iOS specific meta tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- iOS specific meta tags - fixed deprecated tag -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="AgriPrice" />
+    
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.open-meteo.com https://*.nominatim.openstreetmap.org https://*.kilimo.go.ke data: blob: 'unsafe-inline'; script-src 'self' https://cdn.gpteng.co 'unsafe-inline';">
   </head>
 
   <body>
@@ -34,7 +38,6 @@
               if ('sync' in registration) {
                 navigator.serviceWorker.ready.then(active => {
                   active.sync.register('sync-market-prices')
-                    .then(() => console.log('Registered background sync'))
                     .catch(err => console.error('Error registering background sync:', err));
                 });
               }

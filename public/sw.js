@@ -3,12 +3,10 @@ const CACHE_NAME = 'agri-price-helper-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/src/main.tsx',
-  '/src/App.tsx',
-  '/src/index.css',
   '/manifest.json',
   '/logo192.png',
   '/logo512.png',
+  '/favicon.ico'
 ];
 
 // Install service worker
@@ -24,6 +22,14 @@ self.addEventListener('install', (event) => {
 
 // Cache and return requests
 self.addEventListener('fetch', (event) => {
+  // Don't try to handle non-GET requests or API calls
+  if (event.request.method !== 'GET' || 
+      event.request.url.includes('/api/') || 
+      event.request.url.includes('open-meteo.com') ||
+      event.request.url.includes('kilimo.go.ke')) {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -100,9 +106,6 @@ async function syncMarketPrices() {
     const offlinePrices = JSON.parse(offlinePricesStr);
     if (offlinePrices.length === 0) return;
     
-    // This is just a placeholder - actual sync would need
-    // to be handled in the main app code, as the service worker
-    // doesn't have direct access to Supabase client
     console.log('Service worker attempting to sync', offlinePrices.length, 'offline submissions');
     
     // Notify the main thread to attempt sync
