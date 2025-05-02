@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -30,15 +31,26 @@ export const WeatherUpdates = () => {
         },
         (error) => {
           console.error("Error getting location:", error);
+          // Fallback to a default location (e.g., Nairobi, Kenya)
+          setLocation({
+            lat: -1.286389,
+            lon: 36.817223,
+          });
         }
       );
+    } else {
+      // Fallback to a default location if geolocation is not available
+      setLocation({
+        lat: -1.286389,
+        lon: 36.817223,
+      });
     }
   }, []);
 
   const { data: weather, isLoading, error } = useQuery({
-    queryKey: ["weather", location],
+    queryKey: ["weather", location?.lat, location?.lon],
     queryFn: () => {
-      if (!location) throw new Error("Location not available");
+      if (!location) return Promise.reject("Location not available");
       return fetchWeatherData(location);
     },
     enabled: !!location,
