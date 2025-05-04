@@ -9,6 +9,7 @@ import { CarouselView } from "./market-prices/CarouselView";
 import { ListView } from "./market-prices/ListView";
 import { ExchangeRatesView } from "./market-prices/ExchangeRatesView";
 import { PriceTicker } from "./market-prices/PriceTicker";
+import { KenyaAgriStatsService } from "@/services/KenyaAgriStatsService";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 type Category = Database["public"]["Tables"]["commodity_categories"]["Row"];
@@ -147,6 +148,17 @@ export const MarketPrices = () => {
 
     fetchPrices();
 
+    // Also fetch official market prices from the Kenya Agricultural Statistics API
+    const fetchOfficialPrices = async () => {
+      try {
+        await KenyaAgriStatsService.fetchMarketPrices();
+      } catch (error) {
+        console.error("Error fetching official market prices:", error);
+      }
+    };
+    
+    fetchOfficialPrices();
+
     const channel = supabase
       .channel("market-prices-changes")
       .on(
@@ -215,6 +227,8 @@ export const MarketPrices = () => {
     return acc;
   }, {} as Record<string, MarketPrice[]>);
 
+  const locations = ['All', ...Array.from(new Set(filteredPrices.map(p => p.location)))];
+
   return (
     <div className="space-y-4">
       <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 p-4">
@@ -226,8 +240,8 @@ export const MarketPrices = () => {
       </div>
 
       <div className="space-y-2">
-        {Object.entries(pricesByLocation).map(([location, locationPrices]) => (
-          <PriceTicker key={location} location={location} prices={locationPrices} />
+        {locations.map(loc => (
+          <PriceTicker key={loc} location={loc} prices={filteredPrices} />
         ))}
       </div>
 
