@@ -10,7 +10,7 @@ import type { Location, WeatherData } from "./weather/types";
 const fetchWeatherData = async (location: Location): Promise<WeatherData> => {
   try {
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto`,
       { mode: 'cors' }
     );
     
@@ -144,7 +144,7 @@ export const WeatherUpdates = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-4">Weather Updates</h2>
+      <h2 className="text-2xl font-bold mb-4">Weather Forecast</h2>
       <WeatherCard weather={weather} />
     </div>
   );
