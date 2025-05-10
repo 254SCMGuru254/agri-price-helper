@@ -17,13 +17,50 @@ const config: CapacitorConfig = {
       androidSpinnerStyle: "large",
       iosSpinnerStyle: "small",
       spinnerColor: "#ffffff"
+    },
+    PrivacyScreen: {
+      enable: true
+    },
+    LocalNotifications: {
+      smallIcon: "ic_stat_icon_config_sample",
+      iconColor: "#4f46e5"
+    },
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
     }
   },
   ios: {
-    contentInset: 'always'
+    contentInset: 'always',
+    backgroundColor: "#ffffff",
+    preferredStatusBarStyle: "dark",
+    scheme: "agri-price-helper",
+    appleMapsApiKey: "",
+    permissions: {
+      locationWhenInUse: {
+        message: "We need your location to provide accurate weather and market data for your region"
+      },
+      camera: {
+        message: "We need camera access to allow you to upload photos of crops and market items"
+      },
+      notifications: {
+        message: "We'll notify you about important market price changes and weather alerts"
+      }
+    }
   },
   android: {
-    backgroundColor: "#ffffff"
+    backgroundColor: "#ffffff",
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+    hideLogs: true,
+    permissions: [
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.CAMERA",
+      "android.permission.INTERNET",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE"
+    ]
   }
 };
 

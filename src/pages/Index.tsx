@@ -9,8 +9,14 @@ import { AgriAnalyticsDashboard } from "@/components/agri-chart/AgriAnalyticsDas
 import { Card } from "@/components/ui/card";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
 import { MessagingContainer } from "@/components/messaging/MessagingContainer";
+import { AgriMarketAnalysis } from "@/components/AgriMarketAnalysis";
+import PriceMap from "@/components/PriceMap";
+import { useMarketPrices } from "@/hooks/useMarketPrices";
+import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
+  const { filteredPrices } = useMarketPrices();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -26,22 +32,34 @@ const Index = () => {
           
           <WeatherUpdates />
           
-          <AgriAnalyticsDashboard />
+          <AgriMarketAnalysis />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="p-4 md:p-6 shadow-sm">
-              <h2 className="text-xl font-bold mb-4">Submit Market Prices</h2>
-              <MarketPriceSubmission />
-            </Card>
+          <Separator className="my-8" />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <AgriAnalyticsDashboard />
             
-            <Card className="p-4 md:p-6 shadow-sm">
-              <h2 className="text-xl font-bold mb-4">Farmer Messaging</h2>
-              <MessagingContainer />
-            </Card>
+              <Card className="p-4 md:p-6 shadow-sm">
+                <h2 className="text-xl font-bold mb-4">Submit Market Prices</h2>
+                <MarketPriceSubmission />
+              </Card>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="h-[500px]">
+                <PriceMap prices={filteredPrices} height="100%" />
+              </div>
+              
+              <Card className="p-4 md:p-6 shadow-sm">
+                <h2 className="text-xl font-bold mb-4">Farmer Messaging</h2>
+                <MessagingContainer />
+              </Card>
+            </div>
           </div>
         </div>
         
-        <div id="features" className="py-10 bg-muted/30">
+        <div id="features" className="py-10 bg-muted/30 mt-8">
           <Features />
         </div>
         

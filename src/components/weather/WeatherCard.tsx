@@ -52,7 +52,7 @@ export const WeatherCard = ({ weather }: WeatherCardProps) => {
                 <div className="p-2">
                   <div className="rounded-md border p-3 h-full flex flex-col items-center justify-center text-center">
                     <p className="font-medium">{getDayName(date)}</p>
-                    <WeatherIcon code={weather.current.weather_code} />
+                    <WeatherIcon code={weather.daily.weather_code?.[index] || weather.current.weather_code} />
                     <div className="flex justify-between w-full mt-2">
                       <p className="text-sm font-medium">{weather.daily.temperature_2m_min[index]}°</p>
                       <p className="text-sm font-medium">{weather.daily.temperature_2m_max[index]}°</p>
