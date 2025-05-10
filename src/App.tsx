@@ -13,7 +13,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
-const App = () => (
+const App: React.FC = () => (
   <NetworkProvider>
     <LanguageProvider>
       <TooltipProvider>
