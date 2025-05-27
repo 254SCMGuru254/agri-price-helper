@@ -77,16 +77,20 @@ export const PriceSubmissionContainer = () => {
           description: "Your price has been saved locally and will be submitted when you're back online",
         });
       } else {
-        // Use the RealMarketDataService with rate limiting and security
+        // Submit the price using the RealMarketDataService
         const result = await RealMarketDataService.submitMarketPrice(priceData);
 
-        if (result.success) {
-          // If category was selected, update the price with category
-          if (formData.category_id && result.id) {
-            await supabase
+        if (result.success && result.id) {
+          // Update with category if one was selected
+          if (formData.category_id) {
+            const { error: categoryError } = await supabase
               .from('market_prices')
               .update({ category_id: formData.category_id })
               .eq('id', result.id);
+
+            if (categoryError) {
+              console.warn('Failed to update category:', categoryError);
+            }
           }
 
           toast({
