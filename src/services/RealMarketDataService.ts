@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface RealMarketPrice {
@@ -38,7 +37,7 @@ export class RealMarketDataService {
       const { data: dbPrices, error } = await supabase
         .from('market_prices')
         .select('*')
-        .eq('verified_at', true)
+        .not('verified_at', 'is', null)
         .order('created_at', { ascending: false })
         .limit(100);
 
