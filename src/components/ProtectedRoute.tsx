@@ -1,25 +1,41 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
-import { Card } from "./ui/card";
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from './AuthProvider';
+import { Card } from './ui/card';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiresAuth?: boolean;
+}
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiresAuth = true 
+}) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
+  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
         </Card>
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
+  // If route requires auth but user is not authenticated, redirect to auth page
+  if (requiresAuth && !user) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // If user is authenticated and trying to access auth page, redirect to dashboard
+  if (!requiresAuth && user && location.pathname === '/auth') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

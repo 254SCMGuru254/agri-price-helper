@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./components/LanguageContext";
 import { NetworkProvider } from "./components/NetworkProvider";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Onboarding } from "./components/Onboarding";
 import Index from "./pages/Index";
@@ -14,35 +15,37 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => (
-  <NetworkProvider>
-    <LanguageProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<Index />} />
-          <Route
-            path="/onboarding"
-            element={
-              <ProtectedRoute>
-                <Onboarding />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
-    </LanguageProvider>
-  </NetworkProvider>
+  <ErrorBoundary>
+    <NetworkProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<Index />} />
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <Onboarding />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </LanguageProvider>
+    </NetworkProvider>
+  </ErrorBoundary>
 );
 
 export default App;
