@@ -30,36 +30,6 @@ export const PriceSubmissionContainer = () => {
   // Use the offline sync hook
   useOfflineSync(isOffline, user);
 
-  // Ensure categories are loaded on mount
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("commodity_categories")
-          .select("*")
-          .order("name");
-        
-        if (error) {
-          console.error("Error loading categories:", error);
-          toast({
-            title: "Warning",
-            description: "Could not load commodity categories. You can still submit prices.",
-            variant: "destructive",
-          });
-        } else if (data) {
-          // Store in localStorage for offline use
-          localStorage.setItem('commodity_categories', JSON.stringify(data));
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    if (!isOffline && categories.length === 0) {
-      loadCategories();
-    }
-  }, [isOffline, categories.length, toast]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -107,10 +77,18 @@ export const PriceSubmissionContainer = () => {
           description: "Your price has been saved locally and will be submitted when you're back online",
         });
       } else {
-        // Use the RealMarketDataService with rate limiting
+        // Use the RealMarketDataService with rate limiting and security
         const result = await RealMarketDataService.submitMarketPrice(priceData);
 
         if (result.success) {
+          // If category was selected, update the price with category
+          if (formData.category_id && result.id) {
+            await supabase
+              .from('market_prices')
+              .update({ category_id: formData.category_id })
+              .eq('id', result.id);
+          }
+
           toast({
             title: "Success!",
             description: "Market price submitted successfully and is pending verification",

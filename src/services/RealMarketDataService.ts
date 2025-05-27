@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { SecurityService } from "./SecurityService";
 
 export interface RealMarketPrice {
   id: string;
@@ -260,8 +261,17 @@ export class RealMarketDataService {
     user_id: string;
   }): Promise<{ success: boolean; id?: string; error?: string }> {
     try {
-      // Rate limiting check
-      const rateLimitCheck = await this.checkRateLimit(priceData.user_id);
+      // Security validation
+      const securityCheck = SecurityService.validatePriceSubmission(priceData);
+      if (!securityCheck.isValid) {
+        return { 
+          success: false, 
+          error: `Security validation failed: ${securityCheck.reason}` 
+        };
+      }
+
+      // Rate limiting check using SecurityService
+      const rateLimitCheck = await SecurityService.checkRateLimit(priceData.user_id, 'PRICE_SUBMISSION');
       if (!rateLimitCheck.allowed) {
         return { 
           success: false, 
@@ -272,10 +282,10 @@ export class RealMarketDataService {
       const { data, error } = await supabase
         .from('market_prices')
         .insert({
-          commodity: priceData.commodity,
+          commodity: SecurityService.sanitizeInput(priceData.commodity),
           price: priceData.price,
           unit: priceData.unit,
-          location: priceData.location,
+          location: SecurityService.sanitizeInput(priceData.location),
           is_organic: priceData.is_organic,
           submitted_by: priceData.user_id,
           status: 'pending'
@@ -286,9 +296,6 @@ export class RealMarketDataService {
       if (error) {
         throw error;
       }
-
-      // Log submission for rate limiting
-      await this.logSubmission(priceData.user_id);
 
       return { success: true, id: data.id };
     } catch (error) {

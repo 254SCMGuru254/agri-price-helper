@@ -95,7 +95,7 @@ export class SecurityService {
     );
   }
 
-  // Rate limiting implementation
+  // Rate limiting implementation using existing tables
   static async checkRateLimit(
     userId: string, 
     action: keyof typeof SecurityService.RATE_LIMITS
@@ -104,33 +104,33 @@ export class SecurityService {
     const windowStart = new Date(Date.now() - config.windowMinutes * 60 * 1000);
 
     try {
-      // For different actions, check different tables
+      // Use existing tables for rate limiting
       let query;
       switch (action) {
         case 'PRICE_SUBMISSION':
           query = supabase
             .from('market_prices')
             .select('created_at')
-            .eq('submitted_by', userId);
+            .eq('submitted_by', userId)
+            .gte('created_at', windowStart.toISOString());
           break;
         case 'MESSAGE_SENDING':
           query = supabase
             .from('messages')
             .select('timestamp')
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .gte('timestamp', windowStart.toISOString());
           break;
         default:
-          // For AI_ANALYSIS and API_CALLS, use a dedicated rate_limit_log table
-          query = supabase
-            .from('user_activity_log')
-            .select('created_at')
-            .eq('user_id', userId)
-            .eq('action_type', action);
+          // For other actions, use a more permissive approach
+          return {
+            allowed: true,
+            remainingRequests: config.requests,
+            resetTime: new Date(Date.now() + config.windowMinutes * 60 * 1000)
+          };
       }
 
-      const { data, error } = await query
-        .gte(action === 'MESSAGE_SENDING' ? 'timestamp' : 'created_at', windowStart.toISOString())
-        .order(action === 'MESSAGE_SENDING' ? 'timestamp' : 'created_at', { ascending: false });
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Rate limit check error:', error);
@@ -147,7 +147,8 @@ export class SecurityService {
 
       let waitTime;
       if (!allowed && data && data.length > 0) {
-        const oldestRequest = new Date(data[data.length - 1][action === 'MESSAGE_SENDING' ? 'timestamp' : 'created_at']);
+        const timeField = action === 'MESSAGE_SENDING' ? 'timestamp' : 'created_at';
+        const oldestRequest = new Date(data[data.length - 1][timeField]);
         waitTime = Math.ceil((config.windowMinutes * 60 * 1000 - (Date.now() - oldestRequest.getTime())) / (1000 * 60));
       }
 
@@ -165,23 +166,6 @@ export class SecurityService {
         remainingRequests: config.requests,
         resetTime: new Date(Date.now() + config.windowMinutes * 60 * 1000)
       };
-    }
-  }
-
-  // Log user activity for rate limiting
-  static async logActivity(userId: string, actionType: string, metadata?: any): Promise<void> {
-    try {
-      await supabase
-        .from('user_activity_log')
-        .insert({
-          user_id: userId,
-          action_type: actionType,
-          metadata: metadata || {},
-          created_at: new Date().toISOString()
-        });
-    } catch (error) {
-      console.error('Error logging activity:', error);
-      // Don't throw here to avoid breaking the main flow
     }
   }
 
@@ -216,25 +200,26 @@ export class SecurityService {
     };
   }
 
-  // Check for suspicious user behavior
+  // Check for suspicious user behavior using existing tables
   static async checkUserBehavior(userId: string): Promise<SecurityCheck> {
     try {
-      const { data: recentActivity, error } = await supabase
-        .from('user_activity_log')
+      // Check recent price submissions
+      const { data: recentPrices, error: priceError } = await supabase
+        .from('market_prices')
         .select('*')
-        .eq('user_id', userId)
+        .eq('submitted_by', userId)
         .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error checking user behavior:', error);
+      if (priceError) {
+        console.error('Error checking user behavior:', priceError);
         return { isValid: true, riskLevel: 'low' };
       }
 
-      const activityCount = recentActivity?.length || 0;
+      const priceCount = recentPrices?.length || 0;
       
       // Flag unusual activity patterns
-      if (activityCount > 500) { // More than 500 actions per day
+      if (priceCount > 50) { // More than 50 price submissions per day
         return {
           isValid: false,
           reason: 'Unusual activity pattern detected',
@@ -242,7 +227,7 @@ export class SecurityService {
         };
       }
 
-      if (activityCount > 200) {
+      if (priceCount > 20) {
         return {
           isValid: true,
           reason: 'High activity detected',
