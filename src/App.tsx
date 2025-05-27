@@ -12,6 +12,7 @@ import { Onboarding } from "./components/Onboarding";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Sponsors from "./pages/Sponsors";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => (
@@ -24,6 +25,7 @@ const App: React.FC = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Index />} />
+            <Route path="/sponsors" element={<Sponsors />} />
             <Route
               path="/onboarding"
               element={

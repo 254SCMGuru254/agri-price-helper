@@ -4,27 +4,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-    <title>agri-price-helper</title>
-    <meta name="description" content="Agricultural price information and market trends" />
-    <meta name="author" content="Lovable" />
-    <meta property="og:image" content="/og-image.png" />
+    <title>AgriPrice - Real Agricultural Market Prices for Kenya</title>
+    <meta name="description" content="Connect with fellow farmers, access real-time agricultural market prices, and get expert farming advice tailored for Kenyan agriculture." />
+    <meta name="author" content="AgriPrice Kenya" />
+    <meta property="og:image" content="/logo512.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#4f46e5" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/logo192.png" />
     
-    <!-- iOS specific meta tags - fixed deprecated tag -->
+    <!-- iOS specific meta tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="AgriPrice" />
     
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.open-meteo.com https://*.nominatim.openstreetmap.org https://*.kilimo.go.ke data: blob: 'unsafe-inline'; script-src 'self' https://cdn.gpteng.co 'unsafe-inline';">
+    <!-- Updated Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co https://*.openstreetmap.org https://*.tile.openstreetmap.org https://*.open-meteo.com https://*.nominatim.openstreetmap.org https://*.kilimo.go.ke https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.gpteng.co data: blob: 'unsafe-inline'; script-src 'self' https://cdn.gpteng.co 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:;">
   </head>
 
   <body>
     <div id="root"></div>
-    <!-- Add Lovable script tag here, before the main application script -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
@@ -33,14 +32,6 @@
           navigator.serviceWorker.register('/sw.js')
             .then(registration => {
               console.log('ServiceWorker registration successful:', registration.scope);
-              
-              // Register for sync when back online
-              if ('sync' in registration) {
-                navigator.serviceWorker.ready.then(active => {
-                  active.sync.register('sync-market-prices')
-                    .catch(err => console.error('Error registering background sync:', err));
-                });
-              }
             })
             .catch(error => {
               console.log('ServiceWorker registration failed:', error);

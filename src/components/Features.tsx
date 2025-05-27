@@ -1,25 +1,36 @@
-import { Sprout, TrendingUp, Users, Map } from "lucide-react";
+
+import { Sprout, TrendingUp, Users, Map, Shield, Clock } from "lucide-react";
 
 const features = [
   {
     icon: TrendingUp,
-    title: "Real-Time Market Prices",
-    description: "Access up-to-date agricultural commodity prices verified by the community.",
-  },
-  {
-    icon: Sprout,
-    title: "Agricultural Advice",
-    description: "Get location-specific farming tips and best practices.",
+    title: "Real Market Prices",
+    description: "Access verified prices from Nairobi, Mombasa, Kisumu, and other major Kenyan markets updated daily by farmers.",
   },
   {
     icon: Users,
-    title: "Community Driven",
-    description: "Contribute and verify market prices to help fellow farmers.",
+    title: "Farmer Community",
+    description: "Connect with over 10,000 active farmers across Kenya. Share experiences and learn from each other.",
+  },
+  {
+    icon: Shield,
+    title: "Verified Information",
+    description: "All price data is community-verified and cross-checked with official market sources for accuracy.",
+  },
+  {
+    icon: Clock,
+    title: "Timely Alerts",
+    description: "Get notifications about price changes, weather updates, and market opportunities in your area.",
+  },
+  {
+    icon: Sprout,
+    title: "Crop-Specific Advice",
+    description: "Receive farming tips for maize, beans, potatoes, tomatoes, and other crops suited to Kenyan conditions.",
   },
   {
     icon: Map,
-    title: "Location Based",
-    description: "Find relevant prices and advice for your specific region.",
+    title: "Location-Based Data",
+    description: "Find prices and advice specific to your county and region across all 47 counties in Kenya.",
   },
 ];
 
@@ -28,12 +39,12 @@ export const Features = () => {
     <section className="py-20 px-4 bg-secondary/20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Choose Our Platform?</h2>
+          <h2 className="text-3xl font-bold mb-4">Built for Kenyan Farmers</h2>
           <p className="text-foreground/80">
-            Everything you need to make informed farming decisions
+            Everything you need to make profitable farming decisions in Kenya's agricultural markets
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
             <div
               key={feature.title}
