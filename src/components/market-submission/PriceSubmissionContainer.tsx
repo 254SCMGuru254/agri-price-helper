@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { PriceForm } from "./PriceForm";
 import { useCategories } from "./useCategories";
 import { useOfflineSync } from "./useOfflineSync";
 import { useOnlineStatus } from "./useOnlineStatus";
+import { RealMarketDataService } from "@/services/RealMarketDataService";
 
 export const PriceSubmissionContainer = () => {
   const { user } = useAuth();
@@ -29,8 +30,39 @@ export const PriceSubmissionContainer = () => {
   // Use the offline sync hook
   useOfflineSync(isOffline, user);
 
+  // Ensure categories are loaded on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("commodity_categories")
+          .select("*")
+          .order("name");
+        
+        if (error) {
+          console.error("Error loading categories:", error);
+          toast({
+            title: "Warning",
+            description: "Could not load commodity categories. You can still submit prices.",
+            variant: "destructive",
+          });
+        } else if (data) {
+          // Store in localStorage for offline use
+          localStorage.setItem('commodity_categories', JSON.stringify(data));
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    if (!isOffline && categories.length === 0) {
+      loadCategories();
+    }
+  }, [isOffline, categories.length, toast]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!user && !isOffline) {
       toast({
         title: "Authentication required",
@@ -40,22 +72,31 @@ export const PriceSubmissionContainer = () => {
       return;
     }
 
+    if (!formData.commodity || !formData.price || !formData.location) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const priceData = {
-        commodity: formData.commodity,
+        commodity: formData.commodity.trim(),
         price: parseFloat(formData.price),
         unit: formData.unit,
-        location: formData.location,
+        location: formData.location.trim(),
         is_organic: formData.is_organic,
-        submitted_by: user?.id || 'offline-user',
-        category_id: formData.category_id || null,
+        user_id: user?.id || 'offline-user',
       };
 
       if (isOffline) {
         const offlinePrices = JSON.parse(localStorage.getItem('offline_prices') || '[]');
         offlinePrices.push({
           ...priceData,
+          category_id: formData.category_id || null,
           created_at: new Date().toISOString(),
           pending: true
         });
@@ -66,16 +107,20 @@ export const PriceSubmissionContainer = () => {
           description: "Your price has been saved locally and will be submitted when you're back online",
         });
       } else {
-        const { error } = await supabase.from("market_prices").insert(priceData);
+        // Use the RealMarketDataService with rate limiting
+        const result = await RealMarketDataService.submitMarketPrice(priceData);
 
-        if (error) throw error;
-
-        toast({
-          title: "Success!",
-          description: "Market price submitted successfully",
-        });
+        if (result.success) {
+          toast({
+            title: "Success!",
+            description: "Market price submitted successfully and is pending verification",
+          });
+        } else {
+          throw new Error(result.error || "Submission failed");
+        }
       }
 
+      // Reset form
       setFormData({
         commodity: "",
         price: "",
@@ -88,7 +133,7 @@ export const PriceSubmissionContainer = () => {
       console.error("Error submitting market price:", error);
       toast({
         title: "Error",
-        description: "Failed to submit market price. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit market price. Please try again.",
         variant: "destructive",
       });
     } finally {
