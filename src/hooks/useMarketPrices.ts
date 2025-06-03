@@ -97,6 +97,10 @@ export const useMarketPrices = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
+        // First, populate sample data if needed
+        const { SampleDataService } = await import("@/services/SampleDataService");
+        await SampleDataService.populateSampleData();
+
         const { data, error } = await supabase
           .from("market_prices")
           .select("*, category:commodity_categories(name)")

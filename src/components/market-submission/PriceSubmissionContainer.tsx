@@ -4,7 +4,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { OfflineNotice } from "./OfflineNotice";
-import { PriceForm } from "./PriceForm";
+import { PriceFormImproved } from "./PriceFormImproved";
 import { useCategories } from "./useCategories";
 import { useOfflineSync } from "./useOfflineSync";
 import { useOnlineStatus } from "./useOnlineStatus";
@@ -124,9 +124,9 @@ export const PriceSubmissionContainer = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
       <OfflineNotice isOffline={isOffline} />
-      <PriceForm
+      <PriceFormImproved
         formData={formData}
         setFormData={setFormData}
         categories={categories}

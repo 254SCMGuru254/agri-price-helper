@@ -8,7 +8,7 @@ import { WeatherUpdates } from "@/components/WeatherUpdates";
 import { AgriAnalyticsDashboard } from "@/components/agri-chart/AgriAnalyticsDashboard";
 import { Card } from "@/components/ui/card";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
-import { MessagingContainer } from "@/components/messaging/MessagingContainer";
+import { FarmerContact } from "@/components/FarmerContact";
 import { AgriMarketAnalysis } from "@/components/AgriMarketAnalysis";
 import PriceMap from "@/components/PriceMap";
 import { useMarketPrices } from "@/hooks/useMarketPrices";
@@ -52,8 +52,8 @@ const Index = () => {
               </div>
               
               <Card className="p-4 md:p-6 shadow-sm">
-                <h2 className="text-xl font-bold mb-4">Farmer Messaging</h2>
-                <MessagingContainer />
+                <h2 className="text-xl font-bold mb-4">Connect with Farmers</h2>
+                <FarmerContact />
               </Card>
             </div>
           </div>
