@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/components/ui/use-toast";
-import { KenyaAgriStatsService } from "@/services/KenyaAgriStatsService";
 
 type MarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 type Category = Database["public"]["Tables"]["commodity_categories"]["Row"];
@@ -97,10 +96,7 @@ export const useMarketPrices = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        // First, populate sample data if needed
-        const { SampleDataService } = await import("@/services/SampleDataService");
-        await SampleDataService.populateSampleData();
-
+        // Only fetch farmer-submitted data, no sample data
         const { data, error } = await supabase
           .from("market_prices")
           .select("*, category:commodity_categories(name)")
@@ -122,17 +118,6 @@ export const useMarketPrices = () => {
     };
 
     fetchPrices();
-
-    // Also fetch official market prices from the Kenya Agricultural Statistics API
-    const fetchOfficialPrices = async () => {
-      try {
-        await KenyaAgriStatsService.fetchMarketPrices();
-      } catch (error) {
-        console.error("Error fetching official market prices:", error);
-      }
-    };
-    
-    fetchOfficialPrices();
 
     const channel = supabase
       .channel("market-prices-changes")
