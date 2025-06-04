@@ -46,14 +46,24 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode }> = ({ child
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Check connection type if available
+    // Enhanced connection type detection
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
-      setConnectionType(connection.effectiveType || 'unknown');
-      
-      connection.addEventListener('change', () => {
+      if (connection) {
         setConnectionType(connection.effectiveType || 'unknown');
-      });
+        
+        const updateConnection = () => {
+          setConnectionType(connection.effectiveType || 'unknown');
+        };
+        
+        connection.addEventListener('change', updateConnection);
+        
+        return () => {
+          window.removeEventListener('online', handleOnline);
+          window.removeEventListener('offline', handleOffline);
+          connection.removeEventListener('change', updateConnection);
+        };
+      }
     }
 
     return () => {
@@ -67,7 +77,6 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Sync offline market prices
       const offlinePrices = JSON.parse(localStorage.getItem('offline_prices') || '[]');
       if (offlinePrices.length > 0) {
-        // This would sync with your actual backend
         console.log('Syncing offline prices:', offlinePrices);
         localStorage.removeItem('offline_prices');
         setLastSyncTime(new Date());

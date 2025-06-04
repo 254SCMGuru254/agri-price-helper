@@ -1,10 +1,12 @@
 
-const CACHE_NAME = 'agri-price-helper-v2';
+const CACHE_NAME = 'agri-price-helper-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/logo192.png',
+  '/logo512.png'
 ];
 
 // Install service worker
@@ -21,13 +23,15 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Cache and return requests
+// Enhanced fetch handler with better error handling
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests and API calls
+  // Skip non-GET requests and external API calls
   if (event.request.method !== 'GET' || 
       event.request.url.includes('/api/') || 
       event.request.url.includes('supabase.co') ||
       event.request.url.includes('open-meteo.com') ||
+      event.request.url.includes('openstreetmap.org') ||
+      event.request.url.includes('nominatim.openstreetmap.org') ||
       event.request.url.includes('kilimo.go.ke')) {
     return;
   }
@@ -62,13 +66,16 @@ self.addEventListener('fetch', (event) => {
             if (event.request.mode === 'navigate') {
               return caches.match('/');
             }
-            return new Response('Offline', { status: 503 });
+            return new Response('Offline - Content not available', { 
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
           });
       })
   );
 });
 
-// Update service worker
+// Enhanced service worker activation
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -76,6 +83,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })

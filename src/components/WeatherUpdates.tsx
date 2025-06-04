@@ -11,7 +11,12 @@ const fetchWeatherData = async (location: Location): Promise<WeatherData> => {
   try {
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto`,
-      { mode: 'cors' }
+      { 
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+        }
+      }
     );
     
     if (!response.ok) {
@@ -27,6 +32,7 @@ const fetchWeatherData = async (location: Location): Promise<WeatherData> => {
 
 export const WeatherUpdates = () => {
   const [location, setLocation] = useState<Location | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Default location for Nairobi, Kenya
@@ -39,11 +45,7 @@ export const WeatherUpdates = () => {
     const setDefaultLocation = () => {
       console.log("Using default location (Nairobi, Kenya)");
       setLocation(defaultLocation);
-      toast({
-        title: "Location services unavailable",
-        description: "Using default location (Nairobi, Kenya) for weather data",
-        variant: "default" // Changed from "warning" to "default"
-      });
+      setLocationError("Using default location (Nairobi, Kenya) for weather data");
     };
 
     if ("geolocation" in navigator) {
@@ -61,10 +63,11 @@ export const WeatherUpdates = () => {
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           });
+          setLocationError(null);
         },
         (error) => {
           clearTimeout(timeoutId);
-          console.error("Error getting location:", error);
+          console.log("Geolocation error:", error.message);
           setDefaultLocation();
         },
         { 
@@ -99,7 +102,7 @@ export const WeatherUpdates = () => {
         <Card className="p-6">
           <div className="flex items-center gap-2 text-yellow-600">
             <AlertTriangle size={18} />
-            <p>Awaiting location data...</p>
+            <p>Loading location data...</p>
           </div>
         </Card>
       </div>
@@ -113,8 +116,11 @@ export const WeatherUpdates = () => {
         <Card className="p-6">
           <div className="flex items-center gap-2 text-red-500">
             <AlertTriangle size={18} />
-            <p>Failed to load weather data. Please try again later.</p>
+            <p>Weather service temporarily unavailable. Please try again later.</p>
           </div>
+          {locationError && (
+            <p className="text-sm text-muted-foreground mt-2">{locationError}</p>
+          )}
         </Card>
       </div>
     );
@@ -146,6 +152,9 @@ export const WeatherUpdates = () => {
     <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">Weather Forecast</h2>
       <WeatherCard weather={weather} />
+      {locationError && (
+        <p className="text-xs text-muted-foreground">{locationError}</p>
+      )}
     </div>
   );
 };

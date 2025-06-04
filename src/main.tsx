@@ -7,17 +7,23 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './components/AuthProvider';
+import { NetworkProvider } from './components/NetworkProvider';
 
 // Call the element loader for Capacitor plugins before the app is initialized
 defineCustomElements(window);
 
-// Create a client
+// Create a client with enhanced error handling
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry for certain error types
+        if (error instanceof Error && error.message.includes('CSP')) {
+          return false;
+        }
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
-      // Ensure staleTime is set to prevent frequent refetching
       staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
@@ -31,9 +37,11 @@ createRoot(rootElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <NetworkProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </NetworkProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>
