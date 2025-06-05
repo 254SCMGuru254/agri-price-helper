@@ -13,6 +13,9 @@ import { AgriMarketAnalysis } from "@/components/AgriMarketAnalysis";
 import PriceMap from "@/components/PriceMap";
 import { useMarketPrices } from "@/hooks/useMarketPrices";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Store } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { filteredPrices } = useMarketPrices();
@@ -25,8 +28,24 @@ const Index = () => {
         
         <div className="container mx-auto px-4 py-6 space-y-6 md:space-y-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
               <UserPoints />
+            </div>
+            <div>
+              <Card className="p-4 bg-primary/5 border-primary/20">
+                <div className="text-center">
+                  <Store className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Business Marketplace</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    List your farm, products or services. Top contributors get 3 months free featuring!
+                  </p>
+                  <Link to="/business-marketplace">
+                    <Button size="sm" className="w-full">
+                      Explore Marketplace
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
             </div>
           </div>
           

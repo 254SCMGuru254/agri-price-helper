@@ -1,0 +1,16 @@
+
+import { Navbar } from "@/components/Navbar";
+import { BusinessMarketplace } from "@/components/business/BusinessMarketplace";
+
+const BusinessMarketplacePage = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="container mx-auto px-4 py-8">
+        <BusinessMarketplace />
+      </main>
+    </div>
+  );
+};
+
+export default BusinessMarketplacePage;

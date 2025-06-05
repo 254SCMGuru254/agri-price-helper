@@ -1,7 +1,8 @@
+
 import { Link } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Carrot, User } from "lucide-react";
+import { Carrot, User, Store } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,16 @@ export const Navbar = () => {
           </span>
         </Link>
         
+        <nav className="flex items-center space-x-6 text-sm font-medium">
+          <Link 
+            to="/business-marketplace" 
+            className="flex items-center space-x-1 transition-colors hover:text-foreground/80 text-foreground/60"
+          >
+            <Store className="h-4 w-4" />
+            <span>Business Marketplace</span>
+          </Link>
+        </nav>
+        
         <div className="ml-auto flex items-center space-x-4">
           <NetworkStatus />
           {user ? (
@@ -41,12 +52,17 @@ export const Navbar = () => {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link to="/business-marketplace">
+                    <Store className="mr-2 h-4 w-4" />
+                    <span>My Business</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>

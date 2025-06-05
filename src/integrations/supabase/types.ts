@@ -76,6 +76,90 @@ export type Database = {
           },
         ]
       }
+      business_listings: {
+        Row: {
+          business_name: string
+          business_type: string
+          contact_clicks: number | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string
+          featured_type: string | null
+          featured_until: string | null
+          id: string
+          images: string[] | null
+          is_featured: boolean | null
+          is_verified: boolean | null
+          location: string
+          products_services: string[] | null
+          status: string | null
+          telegram_username: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+          views_count: number | null
+          website_url: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          business_name: string
+          business_type: string
+          contact_clicks?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description: string
+          featured_type?: string | null
+          featured_until?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          location: string
+          products_services?: string[] | null
+          status?: string | null
+          telegram_username?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+          views_count?: number | null
+          website_url?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          business_name?: string
+          business_type?: string
+          contact_clicks?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string
+          featured_type?: string | null
+          featured_until?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          location?: string
+          products_services?: string[] | null
+          status?: string | null
+          telegram_username?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          views_count?: number | null
+          website_url?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       cold_storage_facilities: {
         Row: {
           available_space: string
@@ -227,6 +311,59 @@ export type Database = {
             columns: ["asked_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      featured_payments: {
+        Row: {
+          amount: number
+          business_listing_id: string
+          created_at: string | null
+          currency: string | null
+          duration_months: number
+          id: string
+          payment_method: string
+          payment_reference: string | null
+          payment_status: string | null
+          paypal_order_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          business_listing_id: string
+          created_at?: string | null
+          currency?: string | null
+          duration_months: number
+          id?: string
+          payment_method: string
+          payment_reference?: string | null
+          payment_status?: string | null
+          paypal_order_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          business_listing_id?: string
+          created_at?: string | null
+          currency?: string | null
+          duration_months?: number
+          id?: string
+          payment_method?: string
+          payment_reference?: string | null
+          payment_status?: string | null
+          paypal_order_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_payments_business_listing_id_fkey"
+            columns: ["business_listing_id"]
+            isOneToOne: false
+            referencedRelation: "business_listings"
             referencedColumns: ["id"]
           },
         ]
@@ -662,6 +799,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      award_free_featured_listings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       can_create_product_listing: {
         Args: { user_uuid: string }
         Returns: boolean
