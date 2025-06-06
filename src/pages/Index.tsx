@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { MarketPriceSubmission } from "@/components/MarketPriceSubmission";
 import { FarmerContact } from "@/components/FarmerContact";
 import { AgriMarketAnalysis } from "@/components/AgriMarketAnalysis";
+import { CommunityForum } from "@/components/CommunityForum";
 import PriceMap from "@/components/PriceMap";
 import { useMarketPrices } from "@/hooks/useMarketPrices";
 import { Separator } from "@/components/ui/separator";
@@ -75,6 +76,12 @@ const Index = () => {
                 <FarmerContact />
               </Card>
             </div>
+          </div>
+
+          <Separator className="my-8" />
+          
+          <div id="community">
+            <CommunityForum />
           </div>
         </div>
         

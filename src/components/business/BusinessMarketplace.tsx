@@ -58,17 +58,33 @@ export const BusinessMarketplace = () => {
   ];
 
   const incrementContactClicks = async (businessId: string) => {
-    await supabase
+    const { data: currentBusiness } = await supabase
       .from('business_listings')
-      .update({ contact_clicks: supabase.sql`contact_clicks + 1` })
-      .eq('id', businessId);
+      .select('contact_clicks')
+      .eq('id', businessId)
+      .single();
+
+    if (currentBusiness) {
+      await supabase
+        .from('business_listings')
+        .update({ contact_clicks: (currentBusiness.contact_clicks || 0) + 1 })
+        .eq('id', businessId);
+    }
   };
 
   const incrementViews = async (businessId: string) => {
-    await supabase
+    const { data: currentBusiness } = await supabase
       .from('business_listings')
-      .update({ views_count: supabase.sql`views_count + 1` })
-      .eq('id', businessId);
+      .select('views_count')
+      .eq('id', businessId)
+      .single();
+
+    if (currentBusiness) {
+      await supabase
+        .from('business_listings')
+        .update({ views_count: (currentBusiness.views_count || 0) + 1 })
+        .eq('id', businessId);
+    }
   };
 
   if (showForm) {

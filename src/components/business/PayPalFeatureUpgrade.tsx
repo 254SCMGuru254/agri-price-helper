@@ -40,21 +40,19 @@ export const PayPalFeatureUpgrade: React.FC<PayPalFeatureUpgradeProps> = ({ busi
       if (paymentError) throw paymentError;
 
       // Create PayPal payment
-      const response = await fetch('/api/create-paypal-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await supabase.functions.invoke('create-paypal-payment', {
+        body: {
           amount: amount,
           currency: 'USD',
           description: `Feature business listing for ${duration} month(s)`,
           payment_id: payment.id,
           business_id: businessId
-        }),
+        }
       });
 
-      const paypalData = await response.json();
+      if (response.error) throw response.error;
+      
+      const paypalData = response.data;
       
       if (paypalData.links) {
         // Update payment with PayPal order ID
@@ -107,40 +105,19 @@ export const PayPalFeatureUpgrade: React.FC<PayPalFeatureUpgradeProps> = ({ busi
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="space-y-2">
-          <div className="flex justify-between items-center p-2 border rounded">
-            <div>
-              <p className="font-medium text-sm">1 Month Featured</p>
-              <p className="text-xs text-muted-foreground">Top placement, highlighted border</p>
-            </div>
-            <div className="text-right">
-              <Badge variant="secondary">$9.99</Badge>
-              <Button 
-                size="sm" 
-                onClick={() => handlePayPalPayment(1, 9.99)}
-                disabled={loading}
-                className="ml-2"
-              >
-                {loading ? 'Processing...' : 'Pay Now'}
-              </Button>
-            </div>
-          </div>
-
           <div className="flex justify-between items-center p-2 border rounded border-primary bg-primary/5">
             <div>
               <p className="font-medium text-sm flex items-center">
                 <Zap className="h-3 w-3 mr-1" />
-                12 Months Featured
+                3 Months Featured
               </p>
-              <p className="text-xs text-muted-foreground">Best value! Save 50%</p>
+              <p className="text-xs text-muted-foreground">Best value! Top placement</p>
             </div>
             <div className="text-right">
-              <div className="flex flex-col">
-                <Badge variant="secondary" className="text-xs line-through">$119.88</Badge>
-                <Badge className="bg-primary">$59.99</Badge>
-              </div>
+              <Badge className="bg-primary">$20.00</Badge>
               <Button 
                 size="sm" 
-                onClick={() => handlePayPalPayment(12, 59.99)}
+                onClick={() => handlePayPalPayment(3, 20.00)}
                 disabled={loading}
                 className="ml-2 mt-1"
               >
