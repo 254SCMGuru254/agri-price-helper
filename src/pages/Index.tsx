@@ -15,7 +15,7 @@ import PriceMap from "@/components/PriceMap";
 import { useMarketPrices } from "@/hooks/useMarketPrices";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Store } from "lucide-react";
+import { Store, Award, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -28,7 +28,7 @@ const Index = () => {
         <Hero />
         
         <div className="container mx-auto px-4 py-6 space-y-6 md:space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div id="points" className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               <UserPoints />
             </div>
@@ -52,11 +52,13 @@ const Index = () => {
           
           <WeatherUpdates />
           
-          <AgriMarketAnalysis />
+          <div id="market-prices">
+            <AgriMarketAnalysis />
+          </div>
           
           <Separator className="my-8" />
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div id="analytics" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
               <AgriAnalyticsDashboard />
             
@@ -73,7 +75,46 @@ const Index = () => {
               
               <Card className="p-4 md:p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Connect with Farmers</h2>
-                <FarmerContact />
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Connect directly with farmers and agricultural experts through these platforms:
+                  </p>
+                  <div className="grid grid-cols-1 gap-2">
+                    <a 
+                      href="https://wa.me/254700000000" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <span className="text-green-600 mr-2">📱</span>
+                        WhatsApp Community
+                      </span>
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                    <a 
+                      href="https://t.me/agriprice_kenya" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <span className="text-blue-600 mr-2">✈️</span>
+                        Telegram Channel
+                      </span>
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                    <a 
+                      href="tel:+254700000000" 
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <span className="text-primary mr-2">📞</span>
+                        Call Support: +254 700 000 000
+                      </span>
+                    </a>
+                  </div>
+                </div>
               </Card>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Carrot, User, Store, MessageCircle, Menu } from "lucide-react";
+import { Carrot, User, Store, MessageCircle, Menu, Award, TrendingUp, Users, Phone } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NetworkStatus } from "./NetworkStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -22,9 +32,120 @@ export const Navbar = () => {
 
   const NavigationLinks = () => (
     <>
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Market</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px]">
+                <div className="grid gap-2">
+                  <Link 
+                    to="/#market-prices" 
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="text-sm font-medium leading-none">Market Prices</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      View and submit current market prices
+                    </p>
+                  </Link>
+                  <Link 
+                    to="/#analytics" 
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="text-sm font-medium leading-none">Price Analytics</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      View market trends and analytics
+                    </p>
+                  </Link>
+                </div>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <Link 
+              to="/business-marketplace" 
+              className={cn(navigationMenuTriggerStyle(), "flex items-center space-x-1")}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Store className="h-4 w-4" />
+              <span>Business</span>
+            </Link>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <Link 
+              to="/#community" 
+              className={cn(navigationMenuTriggerStyle(), "flex items-center space-x-1")}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>Community</span>
+            </Link>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>More</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid gap-3 p-6 md:w-[300px]">
+                <div className="grid gap-2">
+                  <Link 
+                    to="/#points" 
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Award className="h-4 w-4 mr-1" />
+                      Points System
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Earn points for contributing to the community
+                    </p>
+                  </Link>
+                  <Link 
+                    to="/#features" 
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="text-sm font-medium leading-none">Features</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Discover all platform features
+                    </p>
+                  </Link>
+                  <Link 
+                    to="/#how-it-works" 
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="text-sm font-medium leading-none">How It Works</div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      Learn how to use the platform
+                    </p>
+                  </Link>
+                </div>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </>
+  );
+
+  const MobileNavigationLinks = () => (
+    <div className="flex flex-col space-y-4 mt-8">
+      <Link 
+        to="/#market-prices" 
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <TrendingUp className="h-4 w-4" />
+        <span>Market Prices</span>
+      </Link>
       <Link 
         to="/business-marketplace" 
-        className="flex items-center space-x-1 transition-colors hover:text-foreground/80 text-foreground/60"
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
         onClick={() => setMobileMenuOpen(false)}
       >
         <Store className="h-4 w-4" />
@@ -32,13 +153,37 @@ export const Navbar = () => {
       </Link>
       <Link 
         to="/#community" 
-        className="flex items-center space-x-1 transition-colors hover:text-foreground/80 text-foreground/60"
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
         onClick={() => setMobileMenuOpen(false)}
       >
         <MessageCircle className="h-4 w-4" />
-        <span>Community</span>
+        <span>Community Forum</span>
       </Link>
-    </>
+      <Link 
+        to="/#points" 
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <Award className="h-4 w-4" />
+        <span>Points System</span>
+      </Link>
+      <Link 
+        to="/#features" 
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <Users className="h-4 w-4" />
+        <span>Features</span>
+      </Link>
+      <Link 
+        to="/#how-it-works" 
+        className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <Phone className="h-4 w-4" />
+        <span>How It Works</span>
+      </Link>
+    </div>
   );
 
   return (
@@ -52,7 +197,7 @@ export const Navbar = () => {
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1">
           <NavigationLinks />
         </nav>
         
@@ -65,9 +210,7 @@ export const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-72">
-              <div className="flex flex-col space-y-4 mt-8">
-                <NavigationLinks />
-              </div>
+              <MobileNavigationLinks />
             </SheetContent>
           </Sheet>
         </div>
@@ -97,6 +240,12 @@ export const Navbar = () => {
                   <Link to="/business-marketplace">
                     <Store className="mr-2 h-4 w-4" />
                     <span>My Business</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/#points">
+                    <Award className="mr-2 h-4 w-4" />
+                    <span>My Points</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
