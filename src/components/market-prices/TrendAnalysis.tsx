@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { KenyaAgriStatsService, MarketPrice } from "@/services/KenyaAgriStatsService";
+import { KenyaAgriStatsService, type MarketPrice } from "@/services/KenyaAgriStatsService";
 import { RefreshCw, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 

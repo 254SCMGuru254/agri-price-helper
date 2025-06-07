@@ -76,6 +76,39 @@ export type Database = {
           },
         ]
       }
+      agricultural_statistics: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          updated_at: string | null
+          value: number
+          year: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          updated_at?: string | null
+          value: number
+          year: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          updated_at?: string | null
+          value?: number
+          year?: number
+        }
+        Relationships: []
+      }
       business_listings: {
         Row: {
           business_name: string
@@ -453,7 +486,9 @@ export type Database = {
           id: string
           is_organic: boolean
           location: string
+          metadata: Json | null
           price: number
+          source: string | null
           status: Database["public"]["Enums"]["price_status"] | null
           submitted_by: string
           unit: string
@@ -469,7 +504,9 @@ export type Database = {
           id?: string
           is_organic?: boolean
           location: string
+          metadata?: Json | null
           price: number
+          source?: string | null
           status?: Database["public"]["Enums"]["price_status"] | null
           submitted_by: string
           unit: string
@@ -485,7 +522,9 @@ export type Database = {
           id?: string
           is_organic?: boolean
           location?: string
+          metadata?: Json | null
           price?: number
+          source?: string | null
           status?: Database["public"]["Enums"]["price_status"] | null
           submitted_by?: string
           unit?: string
@@ -548,6 +587,27 @@ export type Database = {
           timestamp?: string
           user_id?: string
           user_name?: string
+        }
+        Relationships: []
+      }
+      price_analysis: {
+        Row: {
+          analysis_type: string
+          created_at: string | null
+          data: Json
+          id: string
+        }
+        Insert: {
+          analysis_type: string
+          created_at?: string | null
+          data: Json
+          id?: string
+        }
+        Update: {
+          analysis_type?: string
+          created_at?: string | null
+          data?: Json
+          id?: string
         }
         Relationships: []
       }
@@ -704,6 +764,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sync_logs: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          errors: string[] | null
+          id: string
+          records_processed: number | null
+          success: boolean | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          errors?: string[] | null
+          id?: string
+          records_processed?: number | null
+          success?: boolean | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          errors?: string[] | null
+          id?: string
+          records_processed?: number | null
+          success?: boolean | null
+        }
+        Relationships: []
       }
       translations: {
         Row: {

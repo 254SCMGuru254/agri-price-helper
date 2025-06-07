@@ -96,7 +96,7 @@ export const useMarketPrices = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        // Only fetch farmer-submitted data, no sample data
+        // Fetch both farmer and official API data
         const { data, error } = await supabase
           .from("market_prices")
           .select("*, category:commodity_categories(name)")

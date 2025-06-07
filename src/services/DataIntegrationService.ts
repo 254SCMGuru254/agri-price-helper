@@ -42,9 +42,9 @@ export class DataIntegrationService {
             unit: price.unit,
             location: price.location,
             is_organic: price.isOrganic || false,
-            status: 'verified',
+            status: 'approved' as const,
             source: 'OFFICIAL_API',
-            submitted_by: null, // System generated
+            submitted_by: '00000000-0000-0000-0000-000000000000', // System generated
             created_at: price.date,
             metadata: {
               trend: price.trend,
