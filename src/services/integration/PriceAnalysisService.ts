@@ -26,12 +26,12 @@ export class PriceAnalysisService {
         officialPrices || []
       );
 
-      // Store analysis results
+      // Store analysis results - cast to Json type
       await supabase
         .from('price_analysis')
         .insert({
           analysis_type: 'VARIANCE_ANALYSIS',
-          data: varianceAnalysis,
+          data: varianceAnalysis as any, // Cast to Json type
           created_at: new Date().toISOString()
         });
 
