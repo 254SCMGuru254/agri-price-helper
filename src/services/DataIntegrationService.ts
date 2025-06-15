@@ -61,8 +61,8 @@ export class DataIntegrationService {
       if (priceError) {
         result.errors.push(`Price sync error: ${priceError.message}`);
       } else {
-        // Fix: Add null check for insertedPrices
-        result.recordsProcessed += Array.isArray(insertedPrices) ? insertedPrices.length : 0;
+        // Fix: Proper null check for insertedPrices
+        result.recordsProcessed += (insertedPrices && Array.isArray(insertedPrices)) ? insertedPrices.length : 0;
       }
 
       // Store agricultural statistics
@@ -89,7 +89,8 @@ export class DataIntegrationService {
         if (statsError) {
           result.errors.push(`Statistics sync error: ${statsError.message}`);
         } else {
-          result.recordsProcessed += Array.isArray(insertedStats) ? insertedStats.length : 0;
+          // Fix: Proper null check for insertedStats
+          result.recordsProcessed += (insertedStats && Array.isArray(insertedStats)) ? insertedStats.length : 0;
         }
       }
 
