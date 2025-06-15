@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { KenyaAgriStatsService } from "./KenyaAgriStatsService";
 
@@ -54,15 +53,15 @@ export class DataIntegrationService {
           })),
           { 
             onConflict: 'commodity,location,created_at',
-            ignoreDuplicates: true 
+            ignoreDuplicates: false 
           }
-        );
+        )
+        .select();
 
       if (priceError) {
         result.errors.push(`Price sync error: ${priceError.message}`);
-      } else {
-        // Fix: Proper null check for insertedPrices
-        result.recordsProcessed += (insertedPrices && Array.isArray(insertedPrices)) ? insertedPrices.length : 0;
+      } else if (insertedPrices) {
+        result.recordsProcessed += insertedPrices.length;
       }
 
       // Store agricultural statistics
@@ -82,15 +81,15 @@ export class DataIntegrationService {
             })),
             { 
               onConflict: 'name,year',
-              ignoreDuplicates: true 
+              ignoreDuplicates: false 
             }
-          );
+          )
+          .select();
 
         if (statsError) {
           result.errors.push(`Statistics sync error: ${statsError.message}`);
-        } else {
-          // Fix: Proper null check for insertedStats
-          result.recordsProcessed += (insertedStats && Array.isArray(insertedStats)) ? insertedStats.length : 0;
+        } else if (insertedStats) {
+          result.recordsProcessed += insertedStats.length;
         }
       }
 
