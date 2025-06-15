@@ -61,12 +61,13 @@ export class DataIntegrationService {
       if (priceError) {
         result.errors.push(`Price sync error: ${priceError.message}`);
       } else {
-        result.recordsProcessed += insertedPrices?.length || 0;
+        // Fix: Add null check for insertedPrices
+        result.recordsProcessed += Array.isArray(insertedPrices) ? insertedPrices.length : 0;
       }
 
       // Store agricultural statistics
       if (officialStats.length > 0) {
-        const { error: statsError } = await supabase
+        const { data: insertedStats, error: statsError } = await supabase
           .from('agricultural_statistics')
           .upsert(
             officialStats.map(stat => ({
@@ -88,7 +89,7 @@ export class DataIntegrationService {
         if (statsError) {
           result.errors.push(`Statistics sync error: ${statsError.message}`);
         } else {
-          result.recordsProcessed += officialStats.length;
+          result.recordsProcessed += Array.isArray(insertedStats) ? insertedStats.length : 0;
         }
       }
 
