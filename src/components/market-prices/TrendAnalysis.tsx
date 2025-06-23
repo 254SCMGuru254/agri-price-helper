@@ -1,10 +1,8 @@
-
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { KenyaAgriStatsService, type MarketPrice } from "@/services/KenyaAgriStatsService";
 import { RefreshCw, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 

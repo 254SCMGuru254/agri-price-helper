@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { TrendingUp, TrendingDown, MinusIcon } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
-import { KenyaAgriStatsService, MarketPrice } from "@/services/KenyaAgriStatsService";
 
 type SupabaseMarketPrice = Database["public"]["Tables"]["market_prices"]["Row"];
 

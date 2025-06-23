@@ -1,4 +1,3 @@
-
 import { useLanguage } from "@/components/LanguageContext";
 
 export const ChartFooter = () => {
@@ -7,7 +6,7 @@ export const ChartFooter = () => {
   return (
     <div className="mt-4 text-xs text-muted-foreground">
       <p>
-        {t('stats.dataSource') || 'Data Source'}: Kenya Agricultural Statistics
+        Data Source: Not available / Feature removed
       </p>
       <p>
         {t('stats.lastUpdated') || 'Last Updated'}: {new Date().toLocaleDateString()}

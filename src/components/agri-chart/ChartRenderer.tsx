@@ -1,4 +1,3 @@
-
 import {
   AreaChart,
   Area,
@@ -14,12 +13,11 @@ import {
   ResponsiveContainer
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
-import { AgriStatistic } from "@/services/KenyaAgriStatsService";
 import { useLanguage } from "@/components/LanguageContext";
 
 interface ChartRendererProps {
   chartType: 'line' | 'bar' | 'area';
-  processedData: AgriStatistic[];
+  processedData: any[];
   productFilter: string | null;
 }
 

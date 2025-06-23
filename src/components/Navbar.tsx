@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -25,9 +24,13 @@ import { NetworkStatus } from "./NetworkStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/components/LanguageProvider";
+import { UserPoints } from "@/components/UserPoints";
 
 export const Navbar = () => {
   const { user, signOut } = useAuth();
+  const { translate } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const NavigationLinks = () => (
@@ -217,44 +220,48 @@ export const Navbar = () => {
         
         <div className="ml-auto flex items-center space-x-4">
           <NetworkStatus />
+          <LanguageSelector />
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
-                    <AvatarFallback>{user.user_metadata?.full_name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/business-marketplace">
-                    <Store className="mr-2 h-4 w-4" />
-                    <span>My Business</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/#points">
-                    <Award className="mr-2 h-4 w-4" />
-                    <span>My Points</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <UserPoints />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                      <AvatarFallback>{user.user_metadata?.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/business-marketplace">
+                      <Store className="mr-2 h-4 w-4" />
+                      <span>My Business</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/#points">
+                      <Award className="mr-2 h-4 w-4" />
+                      <span>My Points</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <Link to="/auth">
-              <Button>Sign In</Button>
+              <Button>{translate('common.signIn')}</Button>
             </Link>
           )}
         </div>

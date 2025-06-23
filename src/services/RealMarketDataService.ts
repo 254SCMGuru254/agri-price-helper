@@ -1,5 +1,3 @@
-
-import { OfficialDataService } from './market/OfficialDataService';
 import { PriceSubmissionService } from './market/PriceSubmissionService';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,7 +6,6 @@ export type { RealMarketPrice, MarketTrend, PriceSubmissionData, SubmissionResul
 
 export class RealMarketDataService {
   // Re-export main methods
-  static fetchOfficialMarketPrices = OfficialDataService.fetchOfficialMarketPrices;
   static submitMarketPrice = PriceSubmissionService.submitMarketPrice;
 
   static async getMarketTrends() {
